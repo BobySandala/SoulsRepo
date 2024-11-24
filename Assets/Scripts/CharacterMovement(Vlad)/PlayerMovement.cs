@@ -106,6 +106,15 @@ public class PlayerMovement : MonoBehaviour
     {
         // Perform jump by setting vertical velocity
         velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+        if (moveDirection.magnitude > 0.1f) // Player is moving
+        {
+            Debug.Log("jump");
+            animator.SetTrigger("MOVE_JUMP");
+        }
+        else
+        {
+            animator.SetTrigger("IDLE_JUMP");
+        }
     }
 
     void StartRoll()
