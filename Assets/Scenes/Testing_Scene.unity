@@ -140,7 +140,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5545869278780618743, guid: 68d026024b4d89640b73900f06f4f633, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5545869278780618743, guid: 68d026024b4d89640b73900f06f4f633, type: 3}
+      propertyPath: m_TagString
+      value: MainCamera
       objectReference: {fileID: 0}
     - target: {fileID: 7351662182155553272, guid: 68d026024b4d89640b73900f06f4f633, type: 3}
       propertyPath: player
@@ -148,7 +152,11 @@ PrefabInstance:
       objectReference: {fileID: 42532049}
     - target: {fileID: 7351662182155553272, guid: 68d026024b4d89640b73900f06f4f633, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7351662182155553272, guid: 68d026024b4d89640b73900f06f4f633, type: 3}
+      propertyPath: cameraDistance
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 8158256007246821782, guid: 68d026024b4d89640b73900f06f4f633, type: 3}
       propertyPath: m_RootOrder
@@ -156,15 +164,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8158256007246821782, guid: 68d026024b4d89640b73900f06f4f633, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -10.721495
+      value: -1404
       objectReference: {fileID: 0}
     - target: {fileID: 8158256007246821782, guid: 68d026024b4d89640b73900f06f4f633, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -20.826487
+      value: -443.3
       objectReference: {fileID: 0}
     - target: {fileID: 8158256007246821782, guid: 68d026024b4d89640b73900f06f4f633, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -22.882048
+      value: -5.6
       objectReference: {fileID: 0}
     - target: {fileID: 8158256007246821782, guid: 68d026024b4d89640b73900f06f4f633, type: 3}
       propertyPath: m_LocalRotation.w
@@ -323,6 +331,7 @@ GameObject:
   - component: {fileID: 1136378081}
   - component: {fileID: 1136378080}
   - component: {fileID: 1136378079}
+  - component: {fileID: 1136378083}
   m_Layer: 0
   m_Name: Plane
   m_TagString: Untagged
@@ -364,7 +373,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: d0ed5149de65d284194dd0cc2ed15178, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -403,12 +412,33 @@ Transform:
   m_GameObject: {fileID: 1136378078}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 12.569, y: 1, z: 6.3891}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &1136378083
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1136378078}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: d8bb82db822307c458378971ea4be45b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1001 &1544298956
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -478,7 +508,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3604307221056468473, guid: f60faf47d94a67446beea4b58db397a1, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3604307221056468473, guid: f60faf47d94a67446beea4b58db397a1, type: 3}
       propertyPath: cameraTransform
@@ -509,7 +539,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1864640614
 MonoBehaviour:
   m_ObjectHideFlags: 0

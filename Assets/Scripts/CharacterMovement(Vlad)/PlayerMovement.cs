@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    private Animator animator;
+
     public float speed = 5f;              // Movement speed
     public float gravity = -9.81f;        // Gravity force
     public float jumpHeight = 1.5f;       // Jump height
@@ -18,6 +20,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
+        animator = GetComponent<Animator>();
         controller = GetComponent<CharacterController>();
     }
 
@@ -76,14 +79,16 @@ public class PlayerMovement : MonoBehaviour
         Vector3 inputDirection = cameraTransform.forward * vertical + cameraTransform.right * horizontal;
         inputDirection.y = 0f; // Prevent vertical movement
 
-        // Normalize direction and apply speed
+        // Normalize direction and apply speed and toggle animation
         if (inputDirection.magnitude > 0.1f)
         {
+            animator.SetBool("IDLE_TO_WALK_FORWARD", true);
             moveDirection = inputDirection.normalized * speed;
             controller.Move(moveDirection * Time.deltaTime);
         }
         else
         {
+            animator.SetBool("IDLE_TO_WALK_FORWARD", false);
             moveDirection = Vector3.zero; // Stop movement if no input
         }
     }
