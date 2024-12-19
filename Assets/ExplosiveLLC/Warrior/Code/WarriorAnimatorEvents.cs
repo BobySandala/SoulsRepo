@@ -17,7 +17,7 @@ namespace WarriorAnims
 		public UnityEvent OnWeaponSwitch = new UnityEvent();
 
 		[HideInInspector] public WarriorController warriorController;
-
+		/*
 		public void Hit()
 		{ OnHit.Invoke(); }
 
@@ -31,8 +31,23 @@ namespace WarriorAnims
 		{ OnLand.Invoke(); }
 
 		public void Shoot()
-		{ OnShoot.Invoke(); }
+		{ OnShoot.Invoke(); }*/
+		/*
+		public void Hit()
+		{  }
 
+		public void FootR()
+		{  }
+
+		public void FootL()
+		{  }
+
+		public void Land()
+		{  }
+
+		public void Shoot()
+		{  }
+		*/
 		/// <summary>
 		/// Checked when switching weapons to know when to turn on/off weapon models.
 		/// </summary>
