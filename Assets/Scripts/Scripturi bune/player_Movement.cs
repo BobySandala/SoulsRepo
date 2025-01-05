@@ -13,6 +13,11 @@ public class player_Movement : MonoBehaviour
     private bool isBlocking = false;      // State to check if the character is blocking
     private bool isJumping = false; // Tracks if the player is currently jumping
 
+    public GameObject estusFlaskPrefab; // Reference to the Estus Flask Variant prefab
+    private bool isDrinking = false;    // State to track if the player is drinking
+    public GameObject hipEstus;
+
+
 
     void Start()
     {
@@ -51,7 +56,9 @@ public class player_Movement : MonoBehaviour
         HandleAttack();    // Handle attack input
         HandleBlock();     // Handle blocking input
         HandleJump();      // Handle jump and jump attack input
+        HandleDrink();     // Handle drinking input
     }
+
 
     void HandleJump()
     {
@@ -266,10 +273,50 @@ public class player_Movement : MonoBehaviour
         }
     }
 
-
-
     void EndAttack()
     {
         isAttacking = false;
     }
+
+    void HandleDrink()
+    {
+        // Prevent drinking if already drinking, rolling, attacking, or blocking
+        if (isDrinking || isRolling || isAttacking || isBlocking || isJumping) return;
+
+        // Detect 'F' key press
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            // Start drinking action
+            isDrinking = true; // Set drinking state
+            animator.SetTrigger("Drink"); // Trigger Drink animation
+
+            // Deactivate Hip_Estus
+            if (hipEstus != null)
+            {
+                hipEstus.SetActive(false); // Hide Hip_Estus
+            }
+
+            // Activate the Estus Flask prefab
+            estusFlaskPrefab.SetActive(true); // Show Estus Flask Variant during animation
+
+            // Schedule to end the drinking animation (adjust timing to match your animation length)
+            Invoke("EndDrink", 2.0f); // Animation duration: 2 seconds
+        }
+    }
+
+    void EndDrink()
+    {
+        // Reset the drinking state
+        isDrinking = false;
+
+        // Reactivate the Hip_Estus
+        if (hipEstus != null)
+        {
+            hipEstus.SetActive(true); // Show Hip_Estus again
+        }
+
+        // Deactivate the Estus Flask prefab
+        estusFlaskPrefab.SetActive(false); // Hide Estus Flask Variant after animation ends
+    }
+
 }
