@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class player_Camera : MonoBehaviour
 {
@@ -17,6 +18,10 @@ public class player_Camera : MonoBehaviour
     private float yaw = 0.0f;              // Horizontal rotation
     private float pitch = 0.0f;            // Vertical rotation
     private bool isLockedOn = false;       // Lock-on state
+
+    private List<Transform> nearbyTargets = new List<Transform>(); // List of nearby enemies
+    private int targetIndex = 0;           // Index to track current target
+
 
     void Start()
     {
@@ -49,6 +54,11 @@ public class player_Camera : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Q)) // Press Q to toggle lock-on
         {
             ToggleLockOn();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Tab)) // Press Tab to cycle targets
+        {
+            CycleLockOnTarget();
         }
 
         if (isLockedOn && target != null)
@@ -86,32 +96,53 @@ public class player_Camera : MonoBehaviour
         else
         {
             // Lock onto the nearest enemy
-            FindClosestEnemy();
+            FindNearbyEnemies();
+            SelectTarget(0); // Select the first target
         }
     }
 
-    void FindClosestEnemy()
+    // Find all nearby enemies
+    void FindNearbyEnemies()
     {
         float radius = 20.0f; // Lock-on search radius
         Collider[] hits = Physics.OverlapSphere(player.position, radius, LayerMask.GetMask("Enemy")); // Assume enemies are on "Enemy" layer
 
-        float closestDistance = Mathf.Infinity;
-        Transform closestEnemy = null;
+        nearbyTargets.Clear(); // Clear previous targets
 
         foreach (Collider hit in hits)
         {
-            float distance = Vector3.Distance(player.position, hit.transform.position);
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                closestEnemy = hit.transform;
-            }
+            nearbyTargets.Add(hit.transform);
         }
+    }
 
-        if (closestEnemy != null)
+    // Select target based on index
+    void SelectTarget(int index)
+    {
+        if (nearbyTargets.Count > 0)
         {
-            target = closestEnemy;
-            isLockedOn = true;
+            targetIndex = index % nearbyTargets.Count; // Wrap around the list
+            target = nearbyTargets[targetIndex];       // Set the current target
+            isLockedOn = true;                         // Enable lock-on
+        }
+        else
+        {
+            target = null; // No targets available
+            isLockedOn = false;
+        }
+    }
+
+    // Cycle through available targets
+    void CycleLockOnTarget()
+    {
+        if (isLockedOn && nearbyTargets.Count > 0)
+        {
+            targetIndex = (targetIndex + 1) % nearbyTargets.Count; // Move to the next target
+            target = nearbyTargets[targetIndex];
+        }
+        else
+        {
+            FindNearbyEnemies(); // Refresh targets if not locked on
+            SelectTarget(0);     // Lock on to the first target
         }
     }
 
@@ -123,32 +154,35 @@ public class player_Camera : MonoBehaviour
             return;
         }
 
-        // Calculate direction towards the target without affecting player rotation
+        // Direction to target
         Vector3 targetDirection = (target.position - player.position).normalized;
 
-        // Calculate desired position for the camera
-        Vector3 relativePosition = -targetDirection * distance + Vector3.up * lockOnHeightOffset;
+        // Maintain consistent height and enforce minimum distance
+        float clampedDistance = Mathf.Max(distance, minDistance); // Prevent getting too close
+        Vector3 relativePosition = -targetDirection * clampedDistance + Vector3.up * lockOnHeightOffset; // Maintain height offset
         Vector3 desiredPosition = player.position + relativePosition;
 
         // Collision handling
         RaycastHit hit;
         if (Physics.SphereCast(player.position + Vector3.up * heightOffset, collisionRadius, relativePosition.normalized, out hit, distance, collisionLayers))
         {
-            desiredPosition = hit.point + hit.normal * collisionOffset;
+            // Adjust position if collision detected
+            float hitDistance = Vector3.Distance(player.position, hit.point);
+            float adjustedDistance = Mathf.Clamp(hitDistance - collisionOffset, minDistance, distance);
+            relativePosition = -targetDirection * adjustedDistance + Vector3.up * lockOnHeightOffset; // Maintain height
+            desiredPosition = player.position + relativePosition;
         }
 
-        // Smooth camera transition
+        // Smooth camera movement
         transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * rotationSpeed);
 
-        // Look at the target without forcing player rotation
-        Vector3 lookAtPosition = target.position + Vector3.up * 1.0f;
+        // Look at target with added height offset for better angle
+        Vector3 lookAtPosition = target.position + Vector3.up * 1.5f; // Focus slightly above target's center
         Quaternion targetRotation = Quaternion.LookRotation(lookAtPosition - transform.position);
 
-        // Smooth rotation to avoid jitter
+        // Smooth rotation
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
     }
-
-
 
     void FreeLookCamera()
     {

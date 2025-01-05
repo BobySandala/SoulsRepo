@@ -11,6 +11,8 @@ public class player_Movement : MonoBehaviour
     private bool isFacingBackward = false; // State to check if moving backward
     private bool isAttacking = false;     // State to check if the character is attacking
     private bool isBlocking = false;      // State to check if the character is blocking
+    private bool isJumping = false; // Tracks if the player is currently jumping
+
 
     void Start()
     {
@@ -48,7 +50,45 @@ public class player_Movement : MonoBehaviour
         HandleRoll();      // Handle rolling input
         HandleAttack();    // Handle attack input
         HandleBlock();     // Handle blocking input
+        HandleJump();      // Handle jump and jump attack input
     }
+
+    void HandleJump()
+    {
+        // Prevent jumping if already rolling, attacking, or blocking
+        if (isRolling || isAttacking || isBlocking || isJumping) return;
+
+        // Check if 'Ctrl' is pressed for JumpAttack
+        if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) // Ctrl Key
+        {
+            // Trigger JumpAttack
+            isAttacking = true; // Set attacking state
+            isJumping = true;   // Set jumping state
+            animator.SetTrigger("JumpAttack"); // Trigger JumpAttack animation
+            Invoke("EndJump", 1.2f); // Adjust attack duration if needed
+        }
+        else if (Input.GetKeyDown(KeyCode.X)) // Single X press for Jump
+        {
+            // Trigger Jump
+            isJumping = true; // Set jumping state
+            animator.SetTrigger("Jump"); // Trigger Jump animation
+            Invoke("EndJump", 1.0f); // Adjust jump duration if needed
+        }
+    }
+
+    // Resets the jumping and attacking state
+    void EndJump()
+    {
+        isJumping = false; // Reset jumping state
+        isAttacking = false; // Reset attacking state
+
+        // Clear animator triggers to avoid continuous activation
+        animator.ResetTrigger("Jump");
+        animator.ResetTrigger("JumpAttack");
+    }
+
+
+
 
     void HandleMovement()
     {
@@ -109,7 +149,6 @@ public class player_Movement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && !isRolling) // Press Space to roll
         {
             Vector3 rollDirection = Vector3.zero; // Default roll direction
-            string rollDirectionName = "";       // Store roll direction name
 
             // Calculate movement directions relative to the camera
             Vector3 forward = cameraTransform.forward;
@@ -123,42 +162,34 @@ public class player_Movement : MonoBehaviour
             if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A))
             {
                 rollDirection = forward + -right; // Roll diagonally forward-left
-                rollDirectionName = "Forward-Left";
             }
             else if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.D))
             {
                 rollDirection = forward + right; // Roll diagonally forward-right
-                rollDirectionName = "Forward-Right";
             }
             else if (Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.A))
             {
                 rollDirection = -forward + -right; // Roll diagonally backward-left
-                rollDirectionName = "Backward-Left";
             }
             else if (Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.D))
             {
                 rollDirection = -forward + right; // Roll diagonally backward-right
-                rollDirectionName = "Backward-Right";
             }
             else if (Input.GetKey(KeyCode.W))
             {
                 rollDirection = forward; // Roll forward
-                rollDirectionName = "Forward";
             }
             else if (Input.GetKey(KeyCode.S))
             {
                 rollDirection = -forward; // Roll backward
-                rollDirectionName = "Backward";
             }
             else if (Input.GetKey(KeyCode.A))
             {
                 rollDirection = -right; // Roll left
-                rollDirectionName = "Left";
             }
             else if (Input.GetKey(KeyCode.D))
             {
                 rollDirection = right; // Roll right
-                rollDirectionName = "Right";
             }
 
             // Rotate character to face the roll direction
@@ -168,14 +199,12 @@ public class player_Movement : MonoBehaviour
                 transform.rotation = targetRotation; // Instantly rotate to roll direction
             }
 
-            // Log the roll direction (for debugging)
-            Debug.Log("Rolled " + rollDirectionName);
-
             isRolling = true;
             animator.SetBool("Roll", true); // Trigger roll animation
             Invoke("EndRoll", 1.0f); // Roll duration set to 1 second
         }
     }
+
 
     void EndRoll()
     {
@@ -185,28 +214,59 @@ public class player_Movement : MonoBehaviour
 
     void HandleAttack()
     {
-        // Trigger LightAttack1 animation
-        if (Input.GetMouseButtonDown(0) && !isRolling) // Left-click for LightAttack1
+        // Check if the player is already performing an action
+        if (isRolling || isAttacking) return;
+
+        // Detect Shift + Left Click for Heavy Attack
+        if (Input.GetMouseButtonDown(0)) // Left Mouse Button
         {
-            isAttacking = true;
-            animator.SetTrigger("LightAttack1"); // Trigger the LightAttack1 animation
-            Invoke("EndAttack", 1.0f); // Attack duration set to 1 second
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) // Check for Shift key
+            {
+                // Trigger Heavy Attack
+                isAttacking = true;
+                animator.SetTrigger("Heavy"); // Trigger Heavy Attack animation
+                Invoke("EndAttack", 1.5f); // Adjust duration if needed
+            }
+            else
+            {
+                // Trigger Light Attack
+                isAttacking = true;
+                animator.SetTrigger("LightAttack1"); // Trigger Light Attack animation
+                Invoke("EndAttack", 1.0f); // Adjust duration if needed
+            }
         }
     }
+
 
     void HandleBlock()
     {
         if (Input.GetMouseButton(1)) // Hold right-click for Block
         {
-            isBlocking = true;
-            animator.SetBool("Block", true); // Trigger block animation
+            if (!isBlocking) // Start blocking only if not already blocking
+            {
+                isBlocking = true;
+                animator.SetBool("Block", true); // Trigger block animation
+            }
+
+            // Pause the animation at its current frame
+            AnimatorStateInfo stateInfo = animator.GetCurrentAnimatorStateInfo(0);
+            if (stateInfo.IsName("Block"))
+            {
+                animator.speed = 0f; // Pause animation at the current frame
+            }
         }
         else
         {
-            isBlocking = false;
-            animator.SetBool("Block", false); // Stop block animation
+            if (isBlocking) // Stop blocking only if currently blocking
+            {
+                isBlocking = false;
+                animator.SetBool("Block", false); // Stop block animation
+                animator.speed = 1f; // Reset animation speed for smooth playback next time
+            }
         }
     }
+
+
 
     void EndAttack()
     {
