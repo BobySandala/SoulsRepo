@@ -9,7 +9,7 @@ public class HealthBar : MonoBehaviour
     public float maxHealth = 100f;
     public float health;
     private float lerpSpeed = 5f; // Lerp speed multiplier
-    private float sliderLeftOffset = 110f;
+    private float sliderLeftOffset = 275f;
     private Coroutine lerpCoroutine; // Reference to the running coroutine
 
     void Start()
@@ -42,6 +42,14 @@ public class HealthBar : MonoBehaviour
         {
             easeHealthSlider.value = Mathf.Lerp(easeHealthSlider.value, healthSlider.value, Time.deltaTime * lerpSpeed);
         }
+    }
+
+    public void SetMaxHealth(float val)
+    {
+        maxHealth = val;
+        health = maxHealth;
+        SetSliderSize();
+        SetSliderPosition(sliderLeftOffset);
     }
 
     public void TakeDamage(float damage)

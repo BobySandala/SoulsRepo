@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using JetBrains.Annotations;
+using UnityEngine.SceneManagement;
 
 
 namespace DS_ripoff
@@ -16,7 +17,22 @@ namespace DS_ripoff
         }
         public void StartPlayerSelect()
         {
-            StartCoroutine(WorldSaveGameManager.instance.LoadPlayerSelectScene());
+            // Get the current active scene index
+            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
+
+            // Increment the index to load the next scene
+            int nextSceneIndex = currentSceneIndex + 1;
+
+            // Ensure the next scene index is valid (there are no scenes after the last one)
+            if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
+            {
+                // Load the next scene
+                SceneManager.LoadScene(nextSceneIndex);
+            }
+            else
+            {
+                Debug.LogWarning("No next scene to load!");
+            }
         }
 
     }

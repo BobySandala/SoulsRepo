@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: efa068908f80f0449bf49e49b55b4526
   - enabled: 1
-    path: Assets/Scenes/Testing_Scene.unity
-    guid: 50b9ed8d19b15064880154d3da19b25c
+    path: Assets/Scenes/Crypt.unity
+    guid: 6da01dc666a35524e891f7c64154ed59
+  - enabled: 1
+    path: Assets/Scenes/Cathedral.unity
+    guid: c81fc1973a84e4940af3a5048431f85a
   m_configObjects: {}
