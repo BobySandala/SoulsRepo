@@ -16,7 +16,7 @@ public class PlayerData : MonoBehaviour
     public HealthBar staminaBar; // Reference to the HealthBar script
     public OverlayControl overlayControl; // Manages UI overlays
 
-    private bool isPaused = false;
+    public AudioSource restAtBonfire;
 
     // 0 - Game state, 1 - Resting state
     public int state = 0;
@@ -93,6 +93,7 @@ public class PlayerData : MonoBehaviour
             {
                 overlayControl.ShowRestingOverlay();
             }
+            restAtBonfire.Play();
         }
     }
 
