@@ -24,7 +24,7 @@ public class OverlayControl : MonoBehaviour
         int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
 
         // Increment the index to load the next scene
-        int nextSceneIndex = currentSceneIndex - 1;
+        int nextSceneIndex = 0;
 
         // Ensure the next scene index is valid (there are no scenes after the last one)
         if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
@@ -44,6 +44,7 @@ public class OverlayControl : MonoBehaviour
 
         // Increment the index to load the next scene
         int nextSceneIndex = currentSceneIndex + 1;
+        int prevSceneIndex = currentSceneIndex - 1;
 
         // Ensure the next scene index is valid (there are no scenes after the last one)
         if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
@@ -53,7 +54,14 @@ public class OverlayControl : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("No next scene to load!");
+            if (prevSceneIndex > 0)
+            {
+                // Load the next scene
+                SceneManager.LoadScene(prevSceneIndex);
+            } else
+            {
+                Debug.Log("no valid Scene");
+            }
         }
     }
 
