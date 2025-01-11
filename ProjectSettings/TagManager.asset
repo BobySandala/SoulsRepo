@@ -17,8 +17,8 @@ TagManager:
   - Walkable
   - Enemy
   - Player
-  - 
-  - 
+  - Rolling
+  - IgnorePlayer
   - 
   - 
   - 

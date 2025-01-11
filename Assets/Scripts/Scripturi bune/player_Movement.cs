@@ -86,38 +86,43 @@ public class player_Movement : MonoBehaviour
 
     void HandleMovement()
     {
-        // Disable movement while rolling, attacking, or blocking
+        PlayerData playerData = GetComponent<PlayerData>();
+        if (playerData != null && playerData.state == 1) // If the player is sitting
+        {
+            // Allow camera to rotate but disable character movement and rotation
+            Debug.Log("Player is sitting. Character movement and rotation disabled.");
+            return;
+        }
+
+        // Existing movement and rotation logic
         if (isRolling || isAttacking || isBlocking) return;
 
-        // Get input axes
-        float horizontal = Input.GetAxis("Horizontal"); // A/D input (-1 to 1)
-        float vertical = Input.GetAxis("Vertical");     // W/S input (-1 to 1)
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
 
-        // Get camera-relative directions
         Vector3 forward = cameraTransform.forward;
         Vector3 right = cameraTransform.right;
-        forward.y = 0f; // Ignore vertical tilt
-        right.y = 0f;   // Ignore vertical tilt
+        forward.y = 0f;
+        right.y = 0f;
         forward.Normalize();
         right.Normalize();
 
         Vector3 moveDirection = Vector3.zero;
 
-        // Movement controls
-        if (Input.GetKey(KeyCode.W)) // Move forward
+        if (Input.GetKey(KeyCode.W))
         {
             moveDirection = forward;
             isFacingBackward = false;
         }
-        else if (Input.GetKey(KeyCode.A)) // Strafe left
+        else if (Input.GetKey(KeyCode.A))
         {
             moveDirection = isFacingBackward ? right : -right;
         }
-        else if (Input.GetKey(KeyCode.D)) // Strafe right
+        else if (Input.GetKey(KeyCode.D))
         {
             moveDirection = isFacingBackward ? -right : right;
         }
-        else if (Input.GetKey(KeyCode.S)) // Move backward toward camera
+        else if (Input.GetKey(KeyCode.S))
         {
             moveDirection = -forward;
             isFacingBackward = true;
@@ -125,18 +130,18 @@ public class player_Movement : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
 
-        // Rotate character to face forward direction only
         if (Input.GetKey(KeyCode.W) && moveDirection.magnitude >= 0.1f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(moveDirection);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
 
-        // Update animator parameters for movement
-        animator.SetFloat("Front", vertical); // Forward/backward movement
-        animator.SetFloat("Right", horizontal * (isFacingBackward ? -1 : 1)); // Sideways movement (invert if backward)
-        animator.SetFloat("Speed", moveDirection.magnitude); // Blended speed
+        animator.SetFloat("Front", vertical);
+        animator.SetFloat("Right", horizontal * (isFacingBackward ? -1 : 1));
+        animator.SetFloat("Speed", moveDirection.magnitude);
     }
+
+
 
     void HandleRoll()
     {
@@ -198,6 +203,8 @@ public class player_Movement : MonoBehaviour
                 }
 
                 isRolling = true;
+                playerData.SetInvulnerability(true); // Enable invulnerability
+                Debug.Log("Player started rolling. Invulnerability enabled.");
                 animator.SetBool("Roll", true); // Trigger roll animation
                 Invoke("EndRoll", 1.0f); // Roll duration set to 1 second
             }
@@ -211,6 +218,8 @@ public class player_Movement : MonoBehaviour
     void EndRoll()
     {
         isRolling = false;
+        GetComponent<PlayerData>().SetInvulnerability(false); // Disable invulnerability
+        Debug.Log("Player finished rolling. Invulnerability disabled.");
         animator.SetBool("Roll", false); // End roll animation
     }
 

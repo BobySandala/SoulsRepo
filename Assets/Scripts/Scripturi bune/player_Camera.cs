@@ -154,15 +154,36 @@ public class player_Camera : MonoBehaviour
 
     void FreeLookCamera()
     {
-        float mouseX = Mathf.Clamp(Input.GetAxis("Mouse X") * rotationSpeed, -5f, 5f);
-        float mouseY = Mathf.Clamp(Input.GetAxis("Mouse Y") * rotationSpeed, -5f, 5f);
+        PlayerData playerData = player.GetComponent<PlayerData>();
+        if (playerData != null && playerData.state == 1) // If the player is sitting
+        {
+            // Allow only horizontal camera movement
+            float mouseX = Input.GetAxis("Mouse X") * rotationSpeed;
 
-        yaw += mouseX;
-        pitch -= mouseY;
+            yaw += mouseX; // Update horizontal rotation
+                           // Lock the pitch (no vertical movement)
+            Quaternion rotation = Quaternion.Euler(0, yaw, 0);
+
+            Vector3 offset = new Vector3(0, 0, -distance);
+            Vector3 desiredPosition = player.position + rotation * offset;
+            desiredPosition.y += heightOffset; // Maintain height offset
+
+            transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * rotationSpeed);
+            transform.LookAt(player.position + Vector3.up * heightOffset); // Always look at the player
+            Debug.Log("Horizontal-only camera movement in sitting state.");
+            return;
+        }
+
+        // Existing free look camera logic for when not sitting
+        float mouseXFree = Input.GetAxis("Mouse X") * rotationSpeed;
+        float mouseYFree = Input.GetAxis("Mouse Y") * rotationSpeed;
+
+        yaw += mouseXFree;
+        pitch -= mouseYFree;
 
         pitch = Mathf.Clamp(pitch, -89f, 89f);
 
-        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
+        Quaternion rotationFree = Quaternion.Euler(pitch, yaw, 0);
 
         float dynamicDistance = distance;
         if (pitch > 45f) // When looking up
@@ -170,13 +191,15 @@ public class player_Camera : MonoBehaviour
             dynamicDistance = Mathf.Lerp(distance, minDistance, (pitch - 45f) / 45f); // Gradually reduce distance
         }
 
-        Vector3 offset = new Vector3(0, 0, -dynamicDistance);
-        Vector3 desiredPosition = player.position + rotation * offset;
-        desiredPosition.y += heightOffset;
+        Vector3 offsetFree = new Vector3(0, 0, -dynamicDistance);
+        Vector3 desiredPositionFree = player.position + rotationFree * offsetFree;
+        desiredPositionFree.y += heightOffset;
 
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * rotationSpeed);
+        transform.position = Vector3.Lerp(transform.position, desiredPositionFree, Time.deltaTime * rotationSpeed);
         transform.LookAt(player.position + Vector3.up * heightOffset);
     }
+
+
 
     void LockOnTarget()
     {

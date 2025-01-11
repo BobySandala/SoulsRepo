@@ -33,6 +33,10 @@ public class PlayerData : MonoBehaviour
     private int staminaRegenAmount;
     private bool isDead = false;
 
+    private bool isInvulnerable = false;
+
+    public Animator animator;             // Reference to the Animator component
+
 
     // 0 - Game state, 1 - Resting state
     public int state = 0;
@@ -60,6 +64,11 @@ public class PlayerData : MonoBehaviour
         Cursor.visible = false;
 
         Debug.Log($"Initial Stamina: {stamina}"); // Debug log to verify starting stamina
+
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+        }
     }
 
 
@@ -137,6 +146,14 @@ public class PlayerData : MonoBehaviour
         {
             state = st; // Explicitly set the state
         }
+        if (state == 0)
+        {
+            animator.SetBool("Sit",false);
+        }
+        else if (state == 1)
+        {
+            animator.SetBool("Sit",true);
+        }
 
         Debug.Log("Player state changed: " + state);
 
@@ -196,7 +213,16 @@ public class PlayerData : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
-        if (isDead) return;
+        if (isDead)
+        {
+            Debug.Log("Player is already dead. No damage applied.");
+            return;
+        }
+        if (isInvulnerable)
+        {
+            Debug.Log("Player is invulnerable. No damage applied.");
+            return;
+        }
 
         health = Mathf.Clamp(health - amount, 0, maxHealth);
         Debug.Log($"Player took damage. Current health: {health}");
@@ -220,6 +246,8 @@ public class PlayerData : MonoBehaviour
     }
 
 
+
+
     public void HealDamage(int amount)
     {
         health = Mathf.Clamp(health + amount, 0, maxHealth);
@@ -230,5 +258,12 @@ public class PlayerData : MonoBehaviour
             healthBar.SetHealth(health);
         }
     }
+
+    public void SetInvulnerability(bool value)
+    {
+        isInvulnerable = value;
+        Debug.Log("Player invulnerability: " + (value ? "Enabled" : "Disabled"));
+    }
+
 
 }
