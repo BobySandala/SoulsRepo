@@ -44,7 +44,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 5aa2ad1cc6bab5e478034b11740a9e2a, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.82
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -65,66 +65,30 @@ AudioSource:
     - serializedVersion: 3
       time: 0.043885656
       value: 1
-      inSlope: -22.7956
-      outSlope: -22.7956
+      inSlope: -0.11898655
+      outSlope: -0.11898655
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.8808143
     - serializedVersion: 3
-      time: 0.052135468
-      value: 0.90285766
-      inSlope: 0.00533498
-      outSlope: 0.00533498
+      time: 0.47269404
+      value: 0.45127544
+      inSlope: -2.4776695
+      outSlope: -2.4776695
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.098120585
-      value: 0.6700058
-      inSlope: -5.6989
-      outSlope: -5.6989
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.26148012
-      value: 0.27879333
-      inSlope: -1.424725
-      outSlope: -1.424725
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.46046025
-      value: 0.13075256
-      inSlope: -0.35618126
-      outSlope: -0.35618126
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.7021705
-      value: 0.0625
-      inSlope: -0.089045316
-      outSlope: -0.089045316
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
+      inWeight: 0.17275424
+      outWeight: 0.19994266
     - serializedVersion: 3
       time: 1
       value: 0
-      inSlope: -0.043903105
-      outSlope: -0.043903105
+      inSlope: -0.24253424
+      outSlope: -0.24253424
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
-      outWeight: 0
+      inWeight: 0.62967473
+      outWeight: 0.33333334
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4

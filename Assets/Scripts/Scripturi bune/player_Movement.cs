@@ -17,8 +17,6 @@ public class player_Movement : MonoBehaviour
     private bool isDrinking = false;    // State to track if the player is drinking
     public GameObject hipEstus;
 
-
-
     void Start()
     {
         // Assign the Animator component if not set
