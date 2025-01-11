@@ -1,90 +1,87 @@
-using System.Collections;
+using System.Collections; // This is required for IEnumerator and coroutines
 using UnityEngine;
 using UnityEngine.UI;
 
 public class HealthBar : MonoBehaviour
 {
-    public Slider healthSlider;
-    public Slider easeHealthSlider;
-    public float maxHealth = 100f;
+    public Slider healthSlider; // The main health slider (red bar)
+    public Slider easeHealthSlider; // The ease slider (yellow bar)
+    public float maxHealth = 400f;
     public float health;
-    private float lerpSpeed = 5f; // Lerp speed multiplier
+    private float lerpSpeed = 5f; // Lerp speed multiplier for the yellow bar
     private float sliderLeftOffset = 275f;
     private Coroutine lerpCoroutine; // Reference to the running coroutine
 
     void Start()
     {
+        // Initialize health to maximum
         health = maxHealth;
-        SetSliderPosition(sliderLeftOffset);
-        SetSliderSize();
 
+        // Set both sliders to reflect full health
         healthSlider.maxValue = maxHealth;
-        easeHealthSlider.maxValue = maxHealth;
-
         healthSlider.value = maxHealth;
+
+        easeHealthSlider.maxValue = maxHealth;
         easeHealthSlider.value = maxHealth;
     }
 
+
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            TakeDamage(60);
-        }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            HealDamage(60);
-        }
-
-        // Smoothly update easeHealthSlider
-        if (easeHealthSlider.value != healthSlider.value)
-        {
-            easeHealthSlider.value = Mathf.Lerp(easeHealthSlider.value, healthSlider.value, Time.deltaTime * lerpSpeed);
-        }
     }
 
-    public void SetMaxHealth(float val)
+    public void SetMaxHealth(float maxHealthValue)
     {
-        maxHealth = val;
+        maxHealth = maxHealthValue;
         health = maxHealth;
-        SetSliderSize();
-        SetSliderPosition(sliderLeftOffset);
+
+        healthSlider.maxValue = maxHealth;
+        healthSlider.value = maxHealth;
+
+        easeHealthSlider.maxValue = maxHealth;
+        easeHealthSlider.value = maxHealth;
     }
 
-    public void TakeDamage(float damage)
+    public void SetHealth(float currentHealth)
     {
-        health = Mathf.Max(health - damage, 0);
-        UpdateHealthSlider();
-    }
+        // Update the red bar (current health) immediately
+        healthSlider.value = Mathf.Clamp(currentHealth, 0, maxHealth);
 
-    public void HealDamage(float heal)
-    {
-        health = Mathf.Min(health + heal, maxHealth);
-        UpdateHealthSlider();
-    }
-
-    private void UpdateHealthSlider()
-    {
-        // Stop any running coroutine before starting a new one
+        // Smoothly update the yellow bar (easeHealthSlider) in a coroutine
         if (lerpCoroutine != null)
         {
             StopCoroutine(lerpCoroutine);
         }
-
-        // Start a new coroutine
-        lerpCoroutine = StartCoroutine(LerpHealth(health));
+        lerpCoroutine = StartCoroutine(LerpEaseHealth());
     }
 
-    private IEnumerator LerpHealth(float targetHealth)
+
+    public void TakeDamage(float damage)
     {
-        while (Mathf.Abs(healthSlider.value - targetHealth) > 0.01f)
+        // Reduce health and update the sliders
+        health = Mathf.Max(health - damage, 0);
+        SetHealth(health);
+    }
+
+    public void HealDamage(float heal)
+    {
+        // Increase health and update the sliders
+        health = Mathf.Min(health + heal, maxHealth);
+        SetHealth(health);
+    }
+
+    private IEnumerator LerpEaseHealth()
+    {
+        // Smoothly move the yellow bar (easeHealthSlider) to match the red bar (healthSlider)
+        while (Mathf.Abs(easeHealthSlider.value - healthSlider.value) > 0.01f)
         {
-            healthSlider.value = Mathf.Lerp(healthSlider.value, targetHealth, Time.deltaTime * lerpSpeed);
+            easeHealthSlider.value = Mathf.Lerp(easeHealthSlider.value, healthSlider.value, Time.deltaTime * lerpSpeed);
             yield return null;
         }
 
-        healthSlider.value = targetHealth; // Snap to the exact target value
+        // Snap the yellow bar to match the red bar exactly
+        easeHealthSlider.value = healthSlider.value;
         lerpCoroutine = null; // Clear the coroutine reference
     }
 
@@ -105,9 +102,6 @@ public class HealthBar : MonoBehaviour
             float width = maxHealth;
             rectTransform.sizeDelta = new Vector2(width, rectTransform.sizeDelta.y);
             rectTransform.anchoredPosition = new Vector2(leftOffset + (width / 2), rectTransform.anchoredPosition.y);
-            rectTransform.anchorMin = new Vector2(0, rectTransform.anchorMin.y);
-            rectTransform.anchorMax = new Vector2(0, rectTransform.anchorMax.y);
-            rectTransform.pivot = new Vector2(0.5f, rectTransform.pivot.y);
         }
     }
 }

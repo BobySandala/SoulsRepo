@@ -58,7 +58,8 @@ public class OverlayControl : MonoBehaviour
             {
                 // Load the next scene
                 SceneManager.LoadScene(prevSceneIndex);
-            } else
+            }
+            else
             {
                 Debug.Log("no valid Scene");
             }
@@ -136,6 +137,6 @@ public class OverlayControl : MonoBehaviour
 
     private void Update()
     {
-        
+
     }
 }

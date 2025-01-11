@@ -6,22 +6,31 @@ public class player_Camera : MonoBehaviour
     public Transform player;               // Player to follow
     public float distance = 10.0f;         // Desired fixed distance from the player
     public float minDistance = 2.0f;       // Minimum distance to maintain from the player
-    public float rotationSpeed = 5.0f;     // Speed of rotation
-    public float collisionOffset = 0.2f;   // Offset to prevent clipping
+    public float rotationSpeed = 3.0f;     // Reduced speed for smoother rotation
+    public float collisionOffset = 0.3f;   // Offset to prevent clipping
     public float heightOffset = 2.0f;      // Height offset to keep the camera slightly above the player
     public float lockOnHeightOffset = 4.0f; // Higher height offset when locked onto an enemy
-    public float collisionRadius = 0.5f;   // Radius for SphereCast to detect thin obstacles
     public LayerMask collisionLayers;      // Layers to check for collisions
     public Transform target;               // Current lock-on target
 
-    private Vector3 offset;                // Offset based on distance
     private float yaw = 0.0f;              // Horizontal rotation
     private float pitch = 0.0f;            // Vertical rotation
     private bool isLockedOn = false;       // Lock-on state
-
     private List<Transform> nearbyTargets = new List<Transform>(); // List of nearby enemies
     private int targetIndex = 0;           // Index to track current target
+    private HashSet<Renderer> hiddenRenderers = new HashSet<Renderer>();
 
+    public float collisionRadius = 0.5f; // Radius for SphereCast to detect thin obstacles
+
+    [Range(0.05f, 2.0f)] // Adjustable slider for minimum closeness in the Inspector
+    public float adjustableMinCloseDistance = 0.1f; // Allow the camera to get very close to the character
+    public float smoothingTime = 0.4f; // Increased for smoother transitions
+    public float heightSmoothingTime = 0.5f; // Increased for smoother height adjustments
+    public float jitterThreshold = 0.05f; // Minimum position change to update
+    public float heightStabilityThreshold = 0.05f; // Ignore minor height changes
+
+    private Vector3 currentVelocity; // SmoothDamp velocity for smoothing camera movement
+    private float currentHeightVelocity; // SmoothDamp velocity for height adjustment
 
     void Start()
     {
@@ -30,9 +39,6 @@ public class player_Camera : MonoBehaviour
             Debug.LogError("Player Transform is not assigned!");
             return;
         }
-
-        // Set the initial offset based on the desired distance
-        offset = new Vector3(0, 0, -distance);
 
         // Initialize rotation based on the current camera orientation
         yaw = transform.eulerAngles.y;
@@ -63,12 +69,15 @@ public class player_Camera : MonoBehaviour
 
         if (isLockedOn && target != null)
         {
-            LockOnTarget(); // Focus camera on target
+            LockOnTarget();
         }
         else
         {
-            FreeLookCamera(); // Default free-look behavior
+            FreeLookCamera();
         }
+
+        // Handle obstacles and adjust camera
+        AdjustForObstacles();
     }
 
     void ToggleCursorLock()
@@ -101,7 +110,6 @@ public class player_Camera : MonoBehaviour
         }
     }
 
-    // Find all nearby enemies
     void FindNearbyEnemies()
     {
         float radius = 20.0f; // Lock-on search radius
@@ -115,7 +123,6 @@ public class player_Camera : MonoBehaviour
         }
     }
 
-    // Select target based on index
     void SelectTarget(int index)
     {
         if (nearbyTargets.Count > 0)
@@ -131,7 +138,6 @@ public class player_Camera : MonoBehaviour
         }
     }
 
-    // Cycle through available targets
     void CycleLockOnTarget()
     {
         if (isLockedOn && nearbyTargets.Count > 0)
@@ -146,6 +152,32 @@ public class player_Camera : MonoBehaviour
         }
     }
 
+    void FreeLookCamera()
+    {
+        float mouseX = Mathf.Clamp(Input.GetAxis("Mouse X") * rotationSpeed, -5f, 5f);
+        float mouseY = Mathf.Clamp(Input.GetAxis("Mouse Y") * rotationSpeed, -5f, 5f);
+
+        yaw += mouseX;
+        pitch -= mouseY;
+
+        pitch = Mathf.Clamp(pitch, -89f, 89f);
+
+        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
+
+        float dynamicDistance = distance;
+        if (pitch > 45f) // When looking up
+        {
+            dynamicDistance = Mathf.Lerp(distance, minDistance, (pitch - 45f) / 45f); // Gradually reduce distance
+        }
+
+        Vector3 offset = new Vector3(0, 0, -dynamicDistance);
+        Vector3 desiredPosition = player.position + rotation * offset;
+        desiredPosition.y += heightOffset;
+
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * rotationSpeed);
+        transform.LookAt(player.position + Vector3.up * heightOffset);
+    }
+
     void LockOnTarget()
     {
         if (target == null)
@@ -154,71 +186,116 @@ public class player_Camera : MonoBehaviour
             return;
         }
 
-        // Direction to target
         Vector3 targetDirection = (target.position - player.position).normalized;
 
-        // Maintain consistent height and enforce minimum distance
         float clampedDistance = Mathf.Max(distance, minDistance); // Prevent getting too close
         Vector3 relativePosition = -targetDirection * clampedDistance + Vector3.up * lockOnHeightOffset; // Maintain height offset
         Vector3 desiredPosition = player.position + relativePosition;
 
-        // Collision handling
-        RaycastHit hit;
-        if (Physics.SphereCast(player.position + Vector3.up * heightOffset, collisionRadius, relativePosition.normalized, out hit, distance, collisionLayers))
-        {
-            // Adjust position if collision detected
-            float hitDistance = Vector3.Distance(player.position, hit.point);
-            float adjustedDistance = Mathf.Clamp(hitDistance - collisionOffset, minDistance, distance);
-            relativePosition = -targetDirection * adjustedDistance + Vector3.up * lockOnHeightOffset; // Maintain height
-            desiredPosition = player.position + relativePosition;
-        }
-
-        // Smooth camera movement
         transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * rotationSpeed);
 
-        // Look at target with added height offset for better angle
         Vector3 lookAtPosition = target.position + Vector3.up * 1.5f; // Focus slightly above target's center
         Quaternion targetRotation = Quaternion.LookRotation(lookAtPosition - transform.position);
 
-        // Smooth rotation
         transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
     }
 
-    void FreeLookCamera()
+    void AdjustForObstacles()
     {
-        // Get mouse inputs for rotation
-        float mouseX = Input.GetAxis("Mouse X") * rotationSpeed;
-        float mouseY = Input.GetAxis("Mouse Y") * rotationSpeed;
+        float desiredDistance = distance * 0.5f;
+        float minCloseDistance = adjustableMinCloseDistance;
 
-        // Update yaw and pitch based on input
-        yaw += mouseX;
-        pitch -= mouseY;
-
-        // Clamp pitch to prevent flipping
-        pitch = Mathf.Clamp(pitch, -89f, 89f);
-
-        // Calculate the desired rotation
-        Quaternion rotation = Quaternion.Euler(pitch, yaw, 0);
-
-        // Calculate the desired position without collision handling
-        Vector3 desiredPosition = player.position + rotation * offset;
-        desiredPosition.y += heightOffset; // Apply height offset
-
-        // Perform a SphereCast to handle collisions with obstacles
-        RaycastHit hit;
-        Vector3 direction = desiredPosition - (player.position + Vector3.up * heightOffset);
-        float maxDistance = direction.magnitude;
-
-        if (Physics.SphereCast(player.position + Vector3.up * heightOffset, collisionRadius, direction.normalized, out hit, maxDistance, collisionLayers))
+        foreach (Renderer renderer in hiddenRenderers)
         {
-            float hitDistance = Vector3.Distance(player.position, hit.point);
-            float adjustedDistance = Mathf.Clamp(hitDistance - collisionOffset, minDistance, distance);
-            desiredPosition = player.position + rotation * new Vector3(0, 0, -adjustedDistance);
-            desiredPosition.y += heightOffset;
+            if (renderer != null) renderer.enabled = true;
+        }
+        hiddenRenderers.Clear();
+
+        Vector3 cameraToCharacterDirection = (player.position + Vector3.up * heightOffset) - transform.position;
+        Vector3 targetPosition = transform.position;
+
+        if (Physics.SphereCast(player.position + Vector3.up * heightOffset, collisionRadius, -cameraToCharacterDirection.normalized, out RaycastHit hit, desiredDistance, collisionLayers))
+        {
+            Renderer obstacleRenderer = hit.collider.GetComponent<Renderer>();
+            if (obstacleRenderer != null)
+            {
+                float targetDistance = Mathf.Clamp(hit.distance - collisionOffset * 2, minCloseDistance, desiredDistance);
+                targetPosition = player.position - cameraToCharacterDirection.normalized * targetDistance + Vector3.up * heightOffset;
+
+                if (Physics.Raycast(transform.position, cameraToCharacterDirection.normalized, out RaycastHit directHit, targetDistance, collisionLayers))
+                {
+                    Renderer directObstacleRenderer = directHit.collider.GetComponent<Renderer>();
+                    if (directObstacleRenderer != null)
+                    {
+                        directObstacleRenderer.enabled = false;
+                        hiddenRenderers.Add(directObstacleRenderer);
+                    }
+                }
+            }
+        }
+        else
+        {
+            targetPosition = player.position - cameraToCharacterDirection.normalized * desiredDistance + Vector3.up * heightOffset;
         }
 
-        // Apply the final position and rotation
-        transform.position = desiredPosition;
-        transform.LookAt(player.position + Vector3.up * heightOffset);
+        AdjustForHeight(ref targetPosition);
+        AdjustCameraWhenLookingUp(ref targetPosition);
+
+        if (Vector3.Distance(transform.position, targetPosition) > jitterThreshold)
+        {
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothingTime * 1.5f);
+        }
+
+        EnsureCharacterVisibility();
+    }
+
+    void AdjustForHeight(ref Vector3 targetPosition)
+    {
+        float groundHeight = GetGroundHeight();
+        float currentHeight = transform.position.y;
+
+        if (Mathf.Abs(currentHeight - groundHeight) > heightStabilityThreshold)
+        {
+            float smoothedHeight = Mathf.SmoothDamp(currentHeight, groundHeight, ref currentHeightVelocity, heightSmoothingTime);
+            targetPosition.y = smoothedHeight;
+        }
+        else
+        {
+            targetPosition.y = currentHeight; // Maintain current height for minor changes
+        }
+    }
+
+    void AdjustCameraWhenLookingUp(ref Vector3 targetPosition)
+    {
+        Vector3 cameraDirection = transform.forward;
+        if (Vector3.Dot(cameraDirection, Vector3.up) > 0.8f) // Check if camera is pointing upwards
+        {
+            float minHeightAboveGround = player.position.y + adjustableMinCloseDistance;
+            targetPosition.y = Mathf.Max(targetPosition.y, minHeightAboveGround);
+        }
+    }
+
+    void EnsureCharacterVisibility()
+    {
+        Vector3 directionToCharacter = (player.position + Vector3.up * heightOffset) - transform.position;
+        if (Physics.Raycast(transform.position, directionToCharacter.normalized, out RaycastHit hit, directionToCharacter.magnitude, collisionLayers))
+        {
+            Renderer obstacleRenderer = hit.collider.GetComponent<Renderer>();
+            if (obstacleRenderer != null)
+            {
+                obstacleRenderer.enabled = false;
+                hiddenRenderers.Add(obstacleRenderer);
+            }
+        }
+    }
+
+    float GetGroundHeight()
+    {
+        if (Physics.Raycast(player.position + Vector3.up * 10.0f, Vector3.down, out RaycastHit hit, 20.0f, collisionLayers))
+        {
+            return hit.point.y + heightOffset;
+        }
+
+        return player.position.y + heightOffset;
     }
 }

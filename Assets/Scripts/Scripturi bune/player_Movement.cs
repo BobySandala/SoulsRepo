@@ -1,4 +1,7 @@
+using System.Collections; // Required for IEnumerator and coroutines
+using System.Collections.Generic;
 using UnityEngine;
+
 
 public class player_Movement : MonoBehaviour
 {
@@ -9,7 +12,7 @@ public class player_Movement : MonoBehaviour
 
     private bool isRolling = false;       // State to check if the character is rolling
     private bool isFacingBackward = false; // State to check if moving backward
-    private bool isAttacking = false;     // State to check if the character is attacking
+    public bool isAttacking = false;     // State to check if the character is attacking
     private bool isBlocking = false;      // State to check if the character is blocking
     private bool isJumping = false; // Tracks if the player is currently jumping
 
@@ -46,54 +49,40 @@ public class player_Movement : MonoBehaviour
         rb.isKinematic = false;
     }
 
-
     void Update()
     {
         HandleMovement();  // Handle movement input
         HandleRoll();      // Handle rolling input
         HandleAttack();    // Handle attack input
         HandleBlock();     // Handle blocking input
-        HandleJump();      // Handle jump and jump attack input
+        HandleJump();      // Handle jump input
         HandleDrink();     // Handle drinking input
     }
 
-
     void HandleJump()
     {
-        // Prevent jumping if already rolling, attacking, or blocking
+        PlayerData playerData = GetComponent<PlayerData>(); // Reference to PlayerData
+        int jumpStaminaCost = playerData.jumpStaminaCost;
+
         if (isRolling || isAttacking || isBlocking || isJumping) return;
 
-        // Check if 'Ctrl' is pressed for JumpAttack
-        if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl)) // Ctrl Key
+        if (Input.GetKeyDown(KeyCode.X) && playerData.stamina >= jumpStaminaCost) // Standard Jump
         {
-            // Trigger JumpAttack
-            isAttacking = true; // Set attacking state
-            isJumping = true;   // Set jumping state
-            animator.SetTrigger("JumpAttack"); // Trigger JumpAttack animation
-            Invoke("EndJump", 1.2f); // Adjust attack duration if needed
-        }
-        else if (Input.GetKeyDown(KeyCode.X)) // Single X press for Jump
-        {
-            // Trigger Jump
-            isJumping = true; // Set jumping state
-            animator.SetTrigger("Jump"); // Trigger Jump animation
-            Invoke("EndJump", 1.0f); // Adjust jump duration if needed
+            playerData.ConsumeStamina(jumpStaminaCost); // Consume stamina
+            Debug.Log("Jump started.");
+            isJumping = true;
+            animator.SetTrigger("Jump");
+            Invoke("EndJump", 1.0f); // Adjust duration if needed
         }
     }
 
-    // Resets the jumping and attacking state
+    // Resets the jumping state
     void EndJump()
     {
         isJumping = false; // Reset jumping state
-        isAttacking = false; // Reset attacking state
-
-        // Clear animator triggers to avoid continuous activation
-        animator.ResetTrigger("Jump");
-        animator.ResetTrigger("JumpAttack");
+        Debug.Log("Jump ended.");
+        animator.ResetTrigger("Jump"); // Clear jump trigger
     }
-
-
-
 
     void HandleMovement()
     {
@@ -151,65 +140,73 @@ public class player_Movement : MonoBehaviour
 
     void HandleRoll()
     {
+        PlayerData playerData = GetComponent<PlayerData>(); // Reference to PlayerData
+
+        int rollStaminaCost = playerData.rollStaminaCost; // Retrieve stamina cost
+
         if (Input.GetKeyDown(KeyCode.Space) && !isRolling) // Press Space to roll
         {
-            Vector3 rollDirection = Vector3.zero; // Default roll direction
+            if (playerData.stamina >= rollStaminaCost) // Check if enough stamina
+            {
+                playerData.ConsumeStamina(rollStaminaCost); // Consume stamina
 
-            // Calculate movement directions relative to the camera
-            Vector3 forward = cameraTransform.forward;
-            Vector3 right = cameraTransform.right;
-            forward.y = 0f; // Ignore vertical tilt
-            right.y = 0f;   // Ignore vertical tilt
-            forward.Normalize();
-            right.Normalize();
+                Vector3 rollDirection = Vector3.zero; // Default roll direction
+                Vector3 forward = cameraTransform.forward;
+                Vector3 right = cameraTransform.right;
+                forward.y = 0f; // Ignore vertical tilt
+                right.y = 0f;   // Ignore vertical tilt
+                forward.Normalize();
+                right.Normalize();
 
-            // Determine roll direction based on input keys
-            if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A))
-            {
-                rollDirection = forward + -right; // Roll diagonally forward-left
-            }
-            else if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.D))
-            {
-                rollDirection = forward + right; // Roll diagonally forward-right
-            }
-            else if (Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.A))
-            {
-                rollDirection = -forward + -right; // Roll diagonally backward-left
-            }
-            else if (Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.D))
-            {
-                rollDirection = -forward + right; // Roll diagonally backward-right
-            }
-            else if (Input.GetKey(KeyCode.W))
-            {
-                rollDirection = forward; // Roll forward
-            }
-            else if (Input.GetKey(KeyCode.S))
-            {
-                rollDirection = -forward; // Roll backward
-            }
-            else if (Input.GetKey(KeyCode.A))
-            {
-                rollDirection = -right; // Roll left
-            }
-            else if (Input.GetKey(KeyCode.D))
-            {
-                rollDirection = right; // Roll right
-            }
+                if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.A))
+                {
+                    rollDirection = forward + -right; // Roll diagonally forward-left
+                }
+                else if (Input.GetKey(KeyCode.W) && Input.GetKey(KeyCode.D))
+                {
+                    rollDirection = forward + right; // Roll diagonally forward-right
+                }
+                else if (Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.A))
+                {
+                    rollDirection = -forward + -right; // Roll diagonally backward-left
+                }
+                else if (Input.GetKey(KeyCode.S) && Input.GetKey(KeyCode.D))
+                {
+                    rollDirection = -forward + right; // Roll diagonally backward-right
+                }
+                else if (Input.GetKey(KeyCode.W))
+                {
+                    rollDirection = forward; // Roll forward
+                }
+                else if (Input.GetKey(KeyCode.S))
+                {
+                    rollDirection = -forward; // Roll backward
+                }
+                else if (Input.GetKey(KeyCode.A))
+                {
+                    rollDirection = -right; // Roll left
+                }
+                else if (Input.GetKey(KeyCode.D))
+                {
+                    rollDirection = right; // Roll right
+                }
 
-            // Rotate character to face the roll direction
-            if (rollDirection != Vector3.zero)
-            {
-                Quaternion targetRotation = Quaternion.LookRotation(rollDirection);
-                transform.rotation = targetRotation; // Instantly rotate to roll direction
-            }
+                if (rollDirection != Vector3.zero)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(rollDirection);
+                    transform.rotation = targetRotation;
+                }
 
-            isRolling = true;
-            animator.SetBool("Roll", true); // Trigger roll animation
-            Invoke("EndRoll", 1.0f); // Roll duration set to 1 second
+                isRolling = true;
+                animator.SetBool("Roll", true); // Trigger roll animation
+                Invoke("EndRoll", 1.0f); // Roll duration set to 1 second
+            }
+            else
+            {
+                Debug.Log("Not enough stamina to roll.");
+            }
         }
     }
-
 
     void EndRoll()
     {
@@ -219,29 +216,48 @@ public class player_Movement : MonoBehaviour
 
     void HandleAttack()
     {
-        // Check if the player is already performing an action
+        PlayerData playerData = GetComponent<PlayerData>(); // Reference to PlayerData
+
+        int lightAttackStaminaCost = playerData.lightAttackStaminaCost;
+        int heavyAttackStaminaCost = playerData.heavyAttackStaminaCost;
+
+        // Original attack logic remains
         if (isRolling || isAttacking) return;
 
-        // Detect Shift + Left Click for Heavy Attack
-        if (Input.GetMouseButtonDown(0)) // Left Mouse Button
+        if (Input.GetMouseButtonDown(0)) // Left Mouse Button for Light Attack
         {
-            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) // Check for Shift key
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) // Heavy Attack
             {
-                // Trigger Heavy Attack
-                isAttacking = true;
-                animator.SetTrigger("Heavy"); // Trigger Heavy Attack animation
-                Invoke("EndAttack", 1.5f); // Adjust duration if needed
+                if (playerData.stamina >= heavyAttackStaminaCost)
+                {
+                    playerData.ConsumeStamina(heavyAttackStaminaCost); // Consume stamina
+                    Debug.Log("Heavy Attack started.");
+                    isAttacking = true;
+                    animator.SetTrigger("Heavy");
+                    Invoke("EndAttack", 1.5f); // Adjust duration if needed
+                }
+                else
+                {
+                    Debug.Log("Not enough stamina for Heavy Attack.");
+                }
             }
-            else
+            else // Light Attack
             {
-                // Trigger Light Attack
-                isAttacking = true;
-                animator.SetTrigger("LightAttack1"); // Trigger Light Attack animation
-                Invoke("EndAttack", 1.0f); // Adjust duration if needed
+                if (playerData.stamina >= lightAttackStaminaCost)
+                {
+                    playerData.ConsumeStamina(lightAttackStaminaCost); // Consume stamina
+                    Debug.Log("Light Attack started.");
+                    isAttacking = true;
+                    animator.SetTrigger("LightAttack1");
+                    Invoke("EndAttack", 1.0f); // Adjust duration if needed
+                }
+                else
+                {
+                    Debug.Log("Not enough stamina for Light Attack.");
+                }
             }
         }
     }
-
 
     void HandleBlock()
     {
@@ -274,6 +290,7 @@ public class player_Movement : MonoBehaviour
     void EndAttack()
     {
         isAttacking = false;
+        Debug.Log("Attack ended.");
     }
 
     void HandleDrink()
@@ -281,12 +298,21 @@ public class player_Movement : MonoBehaviour
         // Prevent drinking if already drinking, rolling, attacking, or blocking
         if (isDrinking || isRolling || isAttacking || isBlocking || isJumping) return;
 
+        PlayerData playerData = GetComponent<PlayerData>(); // Reference to PlayerData
+
         // Detect 'F' key press
         if (Input.GetKeyDown(KeyCode.F))
         {
             // Start drinking action
             isDrinking = true; // Set drinking state
             animator.SetTrigger("Drink"); // Trigger Drink animation
+
+            if (playerData != null)
+            {
+                int totalHealthToRestore = playerData.maxHealth / 2; // Half of max health
+                float restoreDuration = 2.0f; // Duration over which health is restored
+                StartCoroutine(GradualHeal(playerData, totalHealthToRestore, restoreDuration));
+            }
 
             // Deactivate Hip_Estus
             if (hipEstus != null)
@@ -302,6 +328,36 @@ public class player_Movement : MonoBehaviour
         }
     }
 
+    IEnumerator GradualHeal(PlayerData playerData, int totalHealthToRestore, float duration)
+    {
+        float elapsedTime = 0f;
+        float initialHealth = playerData.health;
+        float targetHealth = Mathf.Clamp(initialHealth + totalHealthToRestore, 0, playerData.maxHealth);
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            float currentHealth = Mathf.Lerp(initialHealth, targetHealth, elapsedTime / duration);
+            playerData.health = Mathf.Clamp((int)currentHealth, 0, playerData.maxHealth);
+
+            // Update the health bar
+            if (playerData.healthBar != null)
+            {
+                playerData.healthBar.SetHealth(playerData.health);
+            }
+
+            yield return null;
+        }
+
+        // Ensure the final health value is set
+        playerData.health = (int)targetHealth;
+        if (playerData.healthBar != null)
+        {
+            playerData.healthBar.SetHealth(playerData.health);
+        }
+    }
+
+
     void EndDrink()
     {
         // Reset the drinking state
@@ -316,5 +372,4 @@ public class player_Movement : MonoBehaviour
         // Deactivate the Estus Flask prefab
         estusFlaskPrefab.SetActive(false); // Hide Estus Flask Variant after animation ends
     }
-
 }
