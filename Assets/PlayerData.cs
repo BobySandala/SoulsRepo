@@ -43,8 +43,11 @@ public class PlayerData : MonoBehaviour
 
     private void Start()
     {
-        health = Mathf.Clamp(health, 0, maxHealth);
-        stamina = Mathf.Clamp(stamina, 0, maxStamina); // Ensure stamina starts within valid range
+
+        health = maxHealth;
+        healthBar.health = Mathf.Clamp(health, 0, maxHealth);
+        stamina = maxStamina; // Ensure stamina starts within valid range
+        staminaBar.health = Mathf.Clamp(stamina, 0, maxStamina); // Ensure stamina starts within valid range
 
         staminaRegenAmount = maxStamina / 4;
 
