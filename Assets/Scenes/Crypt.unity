@@ -28557,8 +28557,20 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1918630825}
     - target: {fileID: 1283171659446618593, guid: 96f5730731f49014aa0720c8cfaed53f, type: 3}
+      propertyPath: distance
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 1283171659446618593, guid: 96f5730731f49014aa0720c8cfaed53f, type: 3}
       propertyPath: rotationSpeed
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 1283171659446618593, guid: 96f5730731f49014aa0720c8cfaed53f, type: 3}
+      propertyPath: collisionRadius
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1283171659446618593, guid: 96f5730731f49014aa0720c8cfaed53f, type: 3}
+      propertyPath: adjustableMinCloseDistance
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 1883655777309207625, guid: 96f5730731f49014aa0720c8cfaed53f, type: 3}
       propertyPath: m_AnchorMax.x

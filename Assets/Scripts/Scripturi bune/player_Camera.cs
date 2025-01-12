@@ -215,62 +215,74 @@ public class player_Camera : MonoBehaviour
         Vector3 relativePosition = -targetDirection * clampedDistance + Vector3.up * lockOnHeightOffset; // Maintain height offset
         Vector3 desiredPosition = player.position + relativePosition;
 
-        transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * rotationSpeed);
+        // Increase the speed of catching up to the target position
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * (rotationSpeed * 2.0f));
 
         Vector3 lookAtPosition = target.position + Vector3.up * 1.5f; // Focus slightly above target's center
         Quaternion targetRotation = Quaternion.LookRotation(lookAtPosition - transform.position);
 
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationSpeed);
+        // Increase the speed of catching up to the target rotation
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * (rotationSpeed * 2.0f));
     }
+
 
     void AdjustForObstacles()
     {
-        float desiredDistance = distance * 0.5f;
-        float minCloseDistance = adjustableMinCloseDistance;
+        float minCloseDistance = adjustableMinCloseDistance; // Closest distance allowed to the player
+        Vector3 targetPosition = transform.position;
 
+        // Re-enable previously hidden renderers
         foreach (Renderer renderer in hiddenRenderers)
         {
             if (renderer != null) renderer.enabled = true;
         }
         hiddenRenderers.Clear();
 
-        Vector3 cameraToCharacterDirection = (player.position + Vector3.up * heightOffset) - transform.position;
-        Vector3 targetPosition = transform.position;
+        // Calculate direction from camera to player
+        Vector3 playerCenter = player.position + Vector3.up * heightOffset; // Center of the player
+        Vector3 cameraToPlayerDirection = playerCenter - transform.position;
 
-        if (Physics.SphereCast(player.position + Vector3.up * heightOffset, collisionRadius, -cameraToCharacterDirection.normalized, out RaycastHit hit, desiredDistance, collisionLayers))
+        // Check for obstacles using SphereCast
+        if (Physics.SphereCast(playerCenter, collisionRadius, -cameraToPlayerDirection.normalized, out RaycastHit hit, distance, collisionLayers))
         {
+            // If an obstacle is detected, move the camera close to the player
+            float obstacleDistance = Mathf.Clamp(hit.distance - collisionOffset, minCloseDistance, distance);
+            targetPosition = playerCenter - cameraToPlayerDirection.normalized * obstacleDistance;
+
+            // Add extra height to avoid floor obstruction
+            if (Vector3.Dot(cameraToPlayerDirection.normalized, Vector3.up) > 0.5f) // Looking upwards
+            {
+                targetPosition.y += 1.0f; // Raise the camera height to clear the floor
+            }
+
+            // Hide the obstacle renderer to prevent blocking
             Renderer obstacleRenderer = hit.collider.GetComponent<Renderer>();
             if (obstacleRenderer != null)
             {
-                float targetDistance = Mathf.Clamp(hit.distance - collisionOffset * 2, minCloseDistance, desiredDistance);
-                targetPosition = player.position - cameraToCharacterDirection.normalized * targetDistance + Vector3.up * heightOffset;
-
-                if (Physics.Raycast(transform.position, cameraToCharacterDirection.normalized, out RaycastHit directHit, targetDistance, collisionLayers))
-                {
-                    Renderer directObstacleRenderer = directHit.collider.GetComponent<Renderer>();
-                    if (directObstacleRenderer != null)
-                    {
-                        directObstacleRenderer.enabled = false;
-                        hiddenRenderers.Add(directObstacleRenderer);
-                    }
-                }
+                obstacleRenderer.enabled = false;
+                hiddenRenderers.Add(obstacleRenderer);
             }
         }
         else
         {
-            targetPosition = player.position - cameraToCharacterDirection.normalized * desiredDistance + Vector3.up * heightOffset;
+            // Default position when no obstacles are detected
+            targetPosition = playerCenter - cameraToPlayerDirection.normalized * distance;
         }
 
+        // Smoothly move the camera to the target position
+        if (Vector3.Distance(transform.position, targetPosition) > jitterThreshold)
+        {
+            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothingTime);
+        }
+
+        // Adjust for height and upward-looking scenarios
         AdjustForHeight(ref targetPosition);
         AdjustCameraWhenLookingUp(ref targetPosition);
 
-        if (Vector3.Distance(transform.position, targetPosition) > jitterThreshold)
-        {
-            transform.position = Vector3.SmoothDamp(transform.position, targetPosition, ref currentVelocity, smoothingTime * 1.5f);
-        }
-
+        // Ensure the character remains visible
         EnsureCharacterVisibility();
     }
+
 
     void AdjustForHeight(ref Vector3 targetPosition)
     {

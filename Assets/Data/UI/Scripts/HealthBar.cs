@@ -9,7 +9,6 @@ public class HealthBar : MonoBehaviour
     public float maxHealth = 400f;
     public float health;
     private float lerpSpeed = 5f; // Lerp speed multiplier for the yellow bar
-    private float sliderLeftOffset = 275f;
     private Coroutine lerpCoroutine; // Reference to the running coroutine
 
     void Start()

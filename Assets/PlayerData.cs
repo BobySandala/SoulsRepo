@@ -18,17 +18,17 @@ public class PlayerData : MonoBehaviour
     public AudioSource restAtBonfire;
 
     // Stamina costs (doubled)
-    public int rollStaminaCost = 50;            // Original: 25
-    public int lightAttackStaminaCost = 20;    // Original: 10
-    public int heavyAttackStaminaCost = 40;    // Original: 20
+    public int rollStaminaCost = 20;            // Original: 25
+    public int lightAttackStaminaCost = 15;    // Original: 10
+    public int heavyAttackStaminaCost = 30;    // Original: 20
     public int jumpAttackStaminaCost = 60;     // Original: 30
-    public int jumpStaminaCost = 50;           // Original: 25
+    public int jumpStaminaCost = 10;           // Original: 25
 
 
     // Existing variables for stamina management
     private float staminaRegenTimer = 0f;
     private float lastStaminaConsumeTime = 0f;
-    private float staminaRegenDelay = 3f; // Delay before stamina starts regenerating
+    private float staminaRegenDelay = 1.5f; // Delay before stamina starts regenerating
     private float staminaRegenRate = 1f; // Stamina regenerates every second
     private int staminaRegenAmount;
     private bool isDead = false;
@@ -84,7 +84,7 @@ public class PlayerData : MonoBehaviour
             staminaRegenTimer += Time.deltaTime;
             if (staminaRegenTimer >= staminaRegenRate)
             {
-                RegenStamina(staminaRegenAmount);
+                RegenStamina(staminaRegenAmount); // Increase stamina faster
                 staminaRegenTimer = 0f;
             }
         }
@@ -114,17 +114,6 @@ public class PlayerData : MonoBehaviour
         else
         {
             Debug.Log("Not enough stamina to perform the action.");
-        }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        // Check if the object hitting the player is tagged as "EnemySword"
-        if (other.CompareTag("EnemySword"))
-        {
-            int damageAmount = 25; // Damage amount caused by the enemy sword
-            TakeDamage(damageAmount);
-            Debug.Log($"Player hit by EnemySword. Damage taken: {damageAmount}. Current Health: {health}");
         }
     }
 
