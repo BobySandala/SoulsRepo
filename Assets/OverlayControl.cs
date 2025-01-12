@@ -10,7 +10,13 @@ public class OverlayControl : MonoBehaviour
 
     public GameObject ingameOverlay;
     public GameObject restingOverlay;
+    public GameObject bossOverlay;
+    public HealthBar bossHPBar;
+
+    public EnemyController enemyController;
+    public EnemyHealth enemyHealth;
     public Image restImage; // Reference to the Image in the IngameOverlay
+    public bool isBossFight = false;
 
     public void ContinueBtnPressed()
     {
@@ -92,7 +98,7 @@ public class OverlayControl : MonoBehaviour
         }
     }
 
-    void Setup()
+    void Start()
     {
         if (playerObject != null)
         {
@@ -108,6 +114,14 @@ public class OverlayControl : MonoBehaviour
                 ingameOverlay.SetActive(false);
                 restingOverlay.SetActive(true);
             }
+        }
+        if (enemyController != null)
+        {
+            bossHPBar.SetMaxHealth(enemyHealth.maxHealth);
+        }
+        if (bossOverlay != null)
+        {
+            bossOverlay.SetActive(false);
         }
     }
 
@@ -137,6 +151,17 @@ public class OverlayControl : MonoBehaviour
 
     private void Update()
     {
+        if (enemyController != null)
+        {
+            if (enemyController.isActive)
+            {
+                bossOverlay.SetActive(true);
+                //suntem in bossfight
+                isBossFight = true;
 
+                float bossHP = enemyHealth.currentHealth;
+                bossHPBar.SetHealth(bossHP);
+            }
+        }
     }
 }

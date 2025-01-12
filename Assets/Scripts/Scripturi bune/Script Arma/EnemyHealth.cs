@@ -3,8 +3,8 @@ using UnityEngine;
 
 public class EnemyHealth : MonoBehaviour
 {
-    public int maxHealth = 100; // Maximum health of the enemy
-    private int currentHealth;
+    public int maxHealth = 600; // Maximum health of the enemy
+    public int currentHealth;
 
     private Animator animator;
     private Collider enemyCollider; // Reference to the main collider

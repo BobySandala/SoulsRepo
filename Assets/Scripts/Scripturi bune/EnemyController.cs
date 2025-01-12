@@ -14,7 +14,7 @@ public class EnemyController : MonoBehaviour
 
     private Animator animator;
     private float lastAttackTime;
-    private bool isActive = false;
+    public bool isActive = false;
     private string currentAttack; // Track which attack is being used
 
     private float initialYPosition; // To lock the enemy's Y position
