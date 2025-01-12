@@ -13,7 +13,7 @@ public class MainMenuControlScript : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
-        Debug.Log("Game is exiting");
+        //Debug.Log("Game is exiting");
         //Just to make sure its working
     }
 }

@@ -24,7 +24,7 @@ public class AudioSelector : MonoBehaviour
         pm = GetComponent<player_Movement>();
 
         current_index = SceneManager.GetActiveScene().buildIndex;
-        Debug.Log(current_index);
+        //Debug.Log(current_index);
         if (current_index == 3)
         {
             //scena catedrala
@@ -35,7 +35,7 @@ public class AudioSelector : MonoBehaviour
         else if (current_index == 2)
         {
             //scena crypta
-            Debug.Log("crypt");
+            //Debug.Log("crypt");
             currentSound = cryptSund;
         }
 
@@ -48,13 +48,13 @@ public class AudioSelector : MonoBehaviour
         }
         else
         {
-            Debug.Log("null source");
+            //Debug.Log("null source");
         }
 
     }
     public void ToggleAudioChatedral()
     {
-        Debug.Log("Toggle Sound");
+        //Debug.Log("Toggle Sound");
         if (currentSound != null)
         {
             if (currentSound == cathedralSound)

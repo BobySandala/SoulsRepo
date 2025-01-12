@@ -44,7 +44,7 @@ namespace DS_ripoff
                 prefabInstances[0].SetActive(true);
             }
 
-            Debug.Log("Initialization complete");
+            //Debug.Log("Initialization complete");
         }
 
         private void setActiveFalse()
@@ -68,7 +68,7 @@ namespace DS_ripoff
                     }
                     else
                     {
-                        Debug.LogWarning("CLASS does not have TextMeshProUGUI or is not found.");
+                        //Debug.LogWarning("CLASS does not have TextMeshProUGUI or is not found.");
                     }
                     if (editGUI.Find("CLASS").TryGetComponent<TextMeshProUGUI>(out var textbox_HP))
                     {
@@ -76,7 +76,7 @@ namespace DS_ripoff
                     }
                     else
                     {
-                        Debug.LogWarning("CLASS does not have TextMeshProUGUI or is not found.");
+                        //Debug.LogWarning("CLASS does not have TextMeshProUGUI or is not found.");
                     }
                     if (editGUI.Find("CLASS").TryGetComponent<TextMeshProUGUI>(out var textbox_SP))
                     {
@@ -84,7 +84,7 @@ namespace DS_ripoff
                     }
                     else
                     {
-                        Debug.LogWarning("CLASS does not have TextMeshProUGUI or is not found.");
+                        //Debug.LogWarning("CLASS does not have TextMeshProUGUI or is not found.");
                     }
                     if (editGUI.Find("CLASS").TryGetComponent<TextMeshProUGUI>(out var textbox_DMG))
                     {
@@ -92,17 +92,17 @@ namespace DS_ripoff
                     }
                     else
                     {
-                        Debug.LogWarning("CLASS does not have TextMeshProUGUI or is not found.");
+                        //Debug.LogWarning("CLASS does not have TextMeshProUGUI or is not found.");
                     }
                 }
                 else
                 {
-                    Debug.Log("Nu gaseste EDIT GUI");
+                    //Debug.Log("Nu gaseste EDIT GUI");
                 }
             }
             else
             {
-                Debug.Log("Nu gaseste GUI");
+                //Debug.Log("Nu gaseste GUI");
             }
         }
 
@@ -112,7 +112,7 @@ namespace DS_ripoff
         }
         private void ChangeShownCharacter()
         {
-            Debug.Log("Switching to prefab index: " + index);
+            //Debug.Log("Switching to prefab index: " + index);
             setActiveFalse();
             prefabInstances[index].SetActive(true);
             ChangeGUIText();

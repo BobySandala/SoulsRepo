@@ -13,14 +13,16 @@ public class player_Movement : MonoBehaviour
     private bool isRolling = false;       // State to check if the character is rolling
     private bool isFacingBackward = false; // State to check if moving backward
     public bool isAttacking = false;     // State to check if the character is attacking
-    private bool isBlocking = false;      // State to check if the character is blocking
+    public bool isBlocking = false;      // State to check if the character is blocking
     private bool isJumping = false; // Tracks if the player is currently jumping
 
     public GameObject estusFlaskPrefab; // Reference to the Estus Flask Variant prefab
     private bool isDrinking = false;    // State to track if the player is drinking
     public GameObject hipEstus;
 
+    public int EstusCount = 10;
     public AudioClip nomnomnom;
+    public OverlayControl oc;
 
     void Start()
     {
@@ -71,7 +73,7 @@ public class player_Movement : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.X) && playerData.stamina >= jumpStaminaCost) // Standard Jump
         {
             playerData.ConsumeStamina(jumpStaminaCost); // Consume stamina
-            Debug.Log("Jump started.");
+            //Debug.Log("Jump started.");
             isJumping = true;
             animator.SetTrigger("Jump");
             Invoke("EndJump", 1.0f); // Adjust duration if needed
@@ -82,7 +84,7 @@ public class player_Movement : MonoBehaviour
     void EndJump()
     {
         isJumping = false; // Reset jumping state
-        Debug.Log("Jump ended.");
+        //Debug.Log("Jump ended.");
         animator.ResetTrigger("Jump"); // Clear jump trigger
     }
 
@@ -92,7 +94,7 @@ public class player_Movement : MonoBehaviour
         if (playerData != null && playerData.state == 1) // If the player is sitting
         {
             // Allow camera to rotate but disable character movement and rotation
-            Debug.Log("Player is sitting. Character movement and rotation disabled.");
+            //Debug.Log("Player is sitting. Character movement and rotation disabled.");
             return;
         }
 
@@ -206,13 +208,13 @@ public class player_Movement : MonoBehaviour
 
                 isRolling = true;
                 playerData.SetInvulnerability(true); // Enable invulnerability
-                Debug.Log("Player started rolling. Invulnerability enabled.");
+                //Debug.Log("Player started rolling. Invulnerability enabled.");
                 animator.SetBool("Roll", true); // Trigger roll animation
                 Invoke("EndRoll", 1.0f); // Roll duration set to 1 second
             }
             else
             {
-                Debug.Log("Not enough stamina to roll.");
+                //Debug.Log("Not enough stamina to roll.");
             }
         }
     }
@@ -221,7 +223,7 @@ public class player_Movement : MonoBehaviour
     {
         isRolling = false;
         GetComponent<PlayerData>().SetInvulnerability(false); // Disable invulnerability
-        Debug.Log("Player finished rolling. Invulnerability disabled.");
+        //Debug.Log("Player finished rolling. Invulnerability disabled.");
         animator.SetBool("Roll", false); // End roll animation
     }
 
@@ -243,7 +245,7 @@ public class player_Movement : MonoBehaviour
                 if (playerData.stamina >= heavyAttackStaminaCost)
                 {
                     playerData.ConsumeStamina(heavyAttackStaminaCost); // Consume stamina
-                    Debug.Log("Heavy Attack started.");
+                    //Debug.Log("Heavy Attack started.");
                     if (!isAttacking)
                     {
                         GetComponent<AudioSelector>().PlayToporSwing();
@@ -254,7 +256,7 @@ public class player_Movement : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Not enough stamina for Heavy Attack.");
+                    //Debug.Log("Not enough stamina for Heavy Attack.");
                 }
             }
             else // Light Attack
@@ -262,7 +264,7 @@ public class player_Movement : MonoBehaviour
                 if (playerData.stamina >= lightAttackStaminaCost)
                 {
                     playerData.ConsumeStamina(lightAttackStaminaCost); // Consume stamina
-                    Debug.Log("Light Attack started.");
+                    //Debug.Log("Light Attack started.");
                     if (!isAttacking)
                     {
                         GetComponent<AudioSelector>().PlayToporSwing();
@@ -273,7 +275,7 @@ public class player_Movement : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Not enough stamina for Light Attack.");
+                    //Debug.Log("Not enough stamina for Light Attack.");
                 }
             }
         }
@@ -310,7 +312,7 @@ public class player_Movement : MonoBehaviour
     void EndAttack()
     {
         isAttacking = false;
-        Debug.Log("Attack ended.");
+        //Debug.Log("Attack ended.");
     }
 
     void HandleDrink()
@@ -323,29 +325,34 @@ public class player_Movement : MonoBehaviour
         // Detect 'F' key press
         if (Input.GetKeyDown(KeyCode.F))
         {
-            GetComponent<AudioSource>().PlayOneShot(nomnomnom);
-            // Start drinking action
-            isDrinking = true; // Set drinking state
-            animator.SetTrigger("Drink"); // Trigger Drink animation
-
-            if (playerData != null)
+            if (EstusCount > 0)
             {
-                int totalHealthToRestore = playerData.maxHealth / 2; // Half of max health
-                float restoreDuration = 2.0f; // Duration over which health is restored
-                StartCoroutine(GradualHeal(playerData, totalHealthToRestore, restoreDuration));
+                EstusCount--;
+                oc.SetEstusImage(EstusCount);
+                GetComponent<AudioSource>().PlayOneShot(nomnomnom);
+                // Start drinking action
+                isDrinking = true; // Set drinking state
+                animator.SetTrigger("Drink"); // Trigger Drink animation
+
+                if (playerData != null)
+                {
+                    int totalHealthToRestore = playerData.maxHealth / 2; // Half of max health
+                    float restoreDuration = 2.0f; // Duration over which health is restored
+                    StartCoroutine(GradualHeal(playerData, totalHealthToRestore, restoreDuration));
+                }
+
+                // Deactivate Hip_Estus
+                if (hipEstus != null)
+                {
+                    hipEstus.SetActive(false); // Hide Hip_Estus
+                }
+
+                // Activate the Estus Flask prefab
+                estusFlaskPrefab.SetActive(true); // Show Estus Flask Variant during animation
+
+                // Schedule to end the drinking animation (adjust timing to match your animation length)
+                Invoke("EndDrink", 2.0f); // Animation duration: 2 seconds
             }
-
-            // Deactivate Hip_Estus
-            if (hipEstus != null)
-            {
-                hipEstus.SetActive(false); // Hide Hip_Estus
-            }
-
-            // Activate the Estus Flask prefab
-            estusFlaskPrefab.SetActive(true); // Show Estus Flask Variant during animation
-
-            // Schedule to end the drinking animation (adjust timing to match your animation length)
-            Invoke("EndDrink", 2.0f); // Animation duration: 2 seconds
         }
     }
 

@@ -55,7 +55,7 @@ public class StepSounds : MonoBehaviour
         float vel = rb.velocity.magnitude;
         if (vel > 1)
         {
-            Debug.Log("Function called. Velocity: " + rb.velocity.magnitude);
+            //Debug.Log("Function called. Velocity: " + rb.velocity.magnitude);
             AudioClip clip = stoneSteps[Random.Range(0, stoneSteps.Count)];
             source.PlayOneShot(clip);
         }

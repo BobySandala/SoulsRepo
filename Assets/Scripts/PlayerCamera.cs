@@ -23,7 +23,7 @@ public class PlayerCamera : MonoBehaviour
         }
         else
         {
-            Debug.Log("else");
+            //Debug.Log("else");
             Destroy(gameObject);
         }
     }

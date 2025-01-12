@@ -22,10 +22,21 @@ public class OverlayControl : MonoBehaviour
     public Image restImage; // Reference to the Image in the IngameOverlay
     public bool isBossFight = false;
 
+    public Image estusImg;
+
+    public Sprite[] estusImages; 
+
+    public void SetEstusImage(int index)
+    {
+        if (index < 0 || index > 10) return;
+        estusImg.sprite = estusImages[index];
+    }
+
     public void ContinueBtnPressed()
     {
         playerObject.ChangePlayerState(0);
-        Debug.Log("ContinuePressed");
+        //Debug.Log("ContinuePressed");
+        
     }
 
     public void ExitButtonPressed()
@@ -44,7 +55,7 @@ public class OverlayControl : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("No next scene to load!");
+            //Debug.LogWarning("No next scene to load!");
         }
     }
     public void TravelBtnPressed()
@@ -71,7 +82,7 @@ public class OverlayControl : MonoBehaviour
             }
             else
             {
-                Debug.Log("no valid Scene");
+                //Debug.Log("no valid Scene");
             }
         }
     }
@@ -131,11 +142,12 @@ public class OverlayControl : MonoBehaviour
         {
             gameOverOverlay.SetActive(false);
         }
+        estusImg.sprite = estusImages[10];
     }
 
     public void YouDied()
     {
-        Debug.Log("died");
+        //Debug.Log("died");
         bossOverlay.SetActive(false);
         ingameOverlay.SetActive(false);
         restingOverlay.SetActive(false);

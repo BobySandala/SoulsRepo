@@ -10,14 +10,14 @@ public class TriggerZone : MonoBehaviour
     // Function called when the player enters the trigger zone
     public void OnPlayerEnter()
     {
-        Debug.Log("Player entered the trigger zone!");
+        //Debug.Log("Player entered the trigger zone!");
         // Add your custom logic here
     }
 
     // Function called when the player exits the trigger zone
     public void OnPlayerExit()
     {
-        Debug.Log("Player exited the trigger zone!");
+        //Debug.Log("Player exited the trigger zone!");
         // Add your custom logic here
     }
 

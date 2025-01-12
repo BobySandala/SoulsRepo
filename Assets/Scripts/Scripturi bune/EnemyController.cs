@@ -26,7 +26,7 @@ public class EnemyController : MonoBehaviour
 
         if (animator.runtimeAnimatorController.name != "EnemyAnimator")
         {
-            Debug.LogError("Assigned Animator is not 'EnemyAnimator'. Please check the Animator Controller.");
+            //Debug.LogError("Assigned Animator is not 'EnemyAnimator'. Please check the Animator Controller.");
         }
 
         // Ensure root motion is applied
@@ -156,7 +156,7 @@ public class EnemyController : MonoBehaviour
             }
 
             playerData.TakeDamage(damageAmount);
-            Debug.Log($"Player hit by {currentAttack}. Damage: {damageAmount}");
+            //Debug.Log($"Player hit by {currentAttack}. Damage: {damageAmount}");
         }
     }
 }

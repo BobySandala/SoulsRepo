@@ -14,7 +14,7 @@ public class WeaponDamage : MonoBehaviour
         playerMovement = GetComponentInParent<player_Movement>();
         if (playerMovement == null)
         {
-            Debug.LogError("player_Movement script not found on the parent object!");
+            //Debug.LogError("player_Movement script not found on the parent object!");
         }
     }
 
@@ -23,12 +23,12 @@ public class WeaponDamage : MonoBehaviour
         // Check if the player is attacking
         if (playerMovement != null && playerMovement.isAttacking)
         {
-            Debug.Log("Player is attacking, checking for enemy contact...");
+            //Debug.Log("Player is attacking, checking for enemy contact...");
 
             // Check if the object has the enemy tag
             if (other.CompareTag(enemyTag))
             {
-                Debug.Log($"Weapon hit an enemy: {other.name}");
+                //Debug.Log($"Weapon hit an enemy: {other.name}");
 
                 // Try to find a Health component on the enemy
                 EnemyHealth enemyHealth = other.GetComponent<EnemyHealth>();
@@ -38,22 +38,22 @@ public class WeaponDamage : MonoBehaviour
                     int damageAmount = CalculateDamage();
 
                     // Apply damage to the enemy
-                    Debug.Log($"Dealing {damageAmount} damage to {other.name}");
+                    //Debug.Log($"Dealing {damageAmount} damage to {other.name}");
                     enemyHealth.TakeDamage(damageAmount);
                 }
                 else
                 {
-                    Debug.Log($"Enemy {other.name} does not have a health component!");
+                    //Debug.Log($"Enemy {other.name} does not have a health component!");
                 }
             }
             else
             {
-                Debug.Log($"Contact occurred with {other.name}, but it is not tagged as an enemy.");
+                //Debug.Log($"Contact occurred with {other.name}, but it is not tagged as an enemy.");
             }
         }
         else
         {
-            Debug.Log("Player is not attacking. No damage applied.");
+            //Debug.Log("Player is not attacking. No damage applied.");
         }
     }
 

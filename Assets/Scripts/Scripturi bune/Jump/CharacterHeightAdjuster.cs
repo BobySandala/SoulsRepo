@@ -22,7 +22,7 @@ public class CapsuleHeightAdjuster : MonoBehaviour
         }
         else
         {
-            Debug.LogError("CapsuleCollider is not assigned!");
+            //Debug.LogError("CapsuleCollider is not assigned!");
         }
     }
 

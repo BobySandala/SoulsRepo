@@ -46,7 +46,7 @@ namespace DS_ripoff
             }
             else
             {
-                Debug.LogWarning("No next scene to load!");
+                //Debug.LogWarning("No next scene to load!");
             }
         }
     }

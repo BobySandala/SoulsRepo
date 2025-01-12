@@ -36,7 +36,7 @@ public class player_Camera : MonoBehaviour
     {
         if (player == null)
         {
-            Debug.LogError("Player Transform is not assigned!");
+            //Debug.LogError("Player Transform is not assigned!");
             return;
         }
 
@@ -170,7 +170,7 @@ public class player_Camera : MonoBehaviour
 
             transform.position = Vector3.Lerp(transform.position, desiredPosition, Time.deltaTime * rotationSpeed);
             transform.LookAt(player.position + Vector3.up * heightOffset); // Always look at the player
-            Debug.Log("Horizontal-only camera movement in sitting state.");
+            //Debug.Log("Horizontal-only camera movement in sitting state.");
             return;
         }
 

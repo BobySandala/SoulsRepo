@@ -70,7 +70,7 @@ public class PlayerData : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        Debug.Log($"Initial Stamina: {stamina}"); // Debug log to verify starting stamina
+        //Debug.Log($"Initial Stamina: {stamina}"); // Debug log to verify starting stamina
 
         if (animator == null)
         {
@@ -105,7 +105,7 @@ public class PlayerData : MonoBehaviour
         if (stamina >= amount)
         {
             stamina = Mathf.Clamp(stamina - amount, 0, maxStamina);
-            Debug.Log($"Player consumed stamina. Current stamina: {stamina}");
+            //Debug.Log($"Player consumed stamina. Current stamina: {stamina}");
 
             if (staminaBar != null)
             {
@@ -117,7 +117,7 @@ public class PlayerData : MonoBehaviour
         }
         else
         {
-            Debug.Log("Not enough stamina to perform the action.");
+            //Debug.Log("Not enough stamina to perform the action.");
         }
     }
 
@@ -151,7 +151,7 @@ public class PlayerData : MonoBehaviour
             animator.SetBool("Sit",true);
         }
 
-        Debug.Log("Player state changed: " + state);
+        //Debug.Log("Player state changed: " + state);
 
         // Update the overlay and perform state-specific logic
         if (overlayControl != null)
@@ -198,7 +198,7 @@ public class PlayerData : MonoBehaviour
     {
         // Increase stamina, clamping it within valid limits
         stamina = Mathf.Clamp(stamina + amount, 0, maxStamina);
-        Debug.Log($"Player regained stamina. Current stamina: {stamina}");
+        //Debug.Log($"Player regained stamina. Current stamina: {stamina}");
 
         if (staminaBar != null)
         {
@@ -211,17 +211,24 @@ public class PlayerData : MonoBehaviour
     {
         if (isDead)
         {
-            Debug.Log("Player is already dead. No damage applied.");
+            //Debug.Log("Player is already dead. No damage applied.");
             return;
         }
         if (isInvulnerable)
         {
-            Debug.Log("Player is invulnerable. No damage applied.");
+            //Debug.Log("Player is invulnerable. No damage applied.");
             return;
         }
+        bool isBlocking = GetComponent<player_Movement>().isBlocking;
+        if (isBlocking)
+        {
+            amount = amount / 2;
+        }
+        Debug.Log("bosul a dat damage");
+        Debug.Log(amount);
 
         health = Mathf.Clamp(health - amount, 0, maxHealth);
-        Debug.Log($"Player took damage. Current health: {health}");
+        //Debug.Log($"Player took damage. Current health: {health}");
 
         if (healthBar != null)
         {
@@ -233,7 +240,7 @@ public class PlayerData : MonoBehaviour
         if (health <= 0)
         {
             isDead = true;
-            Debug.Log("Player has died.");
+            //Debug.Log("Player has died.");
             Animator playerAnimator = GetComponent<Animator>();
             if (playerAnimator != null)
             {
@@ -250,7 +257,7 @@ public class PlayerData : MonoBehaviour
     public void HealDamage(int amount)
     {
         health = Mathf.Clamp(health + amount, 0, maxHealth);
-        Debug.Log($"Player healed by {amount}. Current health: {health}");
+        //Debug.Log($"Player healed by {amount}. Current health: {health}");
 
         if (healthBar != null)
         {
@@ -262,7 +269,7 @@ public class PlayerData : MonoBehaviour
     public void SetInvulnerability(bool value)
     {
         isInvulnerable = value;
-        Debug.Log("Player invulnerability: " + (value ? "Enabled" : "Disabled"));
+        //Debug.Log("Player invulnerability: " + (value ? "Enabled" : "Disabled"));
     }
 
 

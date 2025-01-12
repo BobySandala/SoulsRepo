@@ -17,13 +17,13 @@ public class EnemyHealth : MonoBehaviour
         animator = GetComponent<Animator>();
         if (animator == null)
         {
-            Debug.LogError("Animator component missing on Enemy!");
+            //Debug.LogError("Animator component missing on Enemy!");
         }
 
         enemyCollider = GetComponent<Collider>();
         if (enemyCollider == null)
         {
-            Debug.LogError("Collider component missing on Enemy!");
+            //Debug.LogError("Collider component missing on Enemy!");
         }
     }
 
@@ -33,7 +33,7 @@ public class EnemyHealth : MonoBehaviour
 
         currentHealth -= amount; // Reduce health
 
-        Debug.Log($"Enemy took {amount} damage! Current health: {currentHealth}");
+        //Debug.Log($"Enemy took {amount} damage! Current health: {currentHealth}");
 
         if (currentHealth <= 0)
         {
@@ -46,7 +46,7 @@ public class EnemyHealth : MonoBehaviour
         if (isDead) return; // Prevent multiple triggers of the death logic
 
         isDead = true; // Mark the enemy as dead
-        Debug.Log("Enemy died!");
+        //Debug.Log("Enemy died!");
 
         // Trigger the die animation
         if (animator != null)
@@ -79,6 +79,6 @@ public class EnemyHealth : MonoBehaviour
             enemyController.enabled = false;
         }
 
-        Debug.Log("Enemy functionality disabled after death.");
+        //Debug.Log("Enemy functionality disabled after death.");
     }
 }
