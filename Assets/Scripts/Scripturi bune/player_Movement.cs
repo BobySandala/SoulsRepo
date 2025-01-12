@@ -20,6 +20,8 @@ public class player_Movement : MonoBehaviour
     private bool isDrinking = false;    // State to track if the player is drinking
     public GameObject hipEstus;
 
+    public AudioClip nomnomnom;
+
     void Start()
     {
         // Assign the Animator component if not set
@@ -225,6 +227,7 @@ public class player_Movement : MonoBehaviour
 
     void HandleAttack()
     {
+        
         PlayerData playerData = GetComponent<PlayerData>(); // Reference to PlayerData
 
         int lightAttackStaminaCost = playerData.lightAttackStaminaCost;
@@ -241,6 +244,10 @@ public class player_Movement : MonoBehaviour
                 {
                     playerData.ConsumeStamina(heavyAttackStaminaCost); // Consume stamina
                     Debug.Log("Heavy Attack started.");
+                    if (!isAttacking)
+                    {
+                        GetComponent<AudioSelector>().PlayToporSwing();
+                    }
                     isAttacking = true;
                     animator.SetTrigger("Heavy");
                     Invoke("EndAttack", 1.5f); // Adjust duration if needed
@@ -256,6 +263,10 @@ public class player_Movement : MonoBehaviour
                 {
                     playerData.ConsumeStamina(lightAttackStaminaCost); // Consume stamina
                     Debug.Log("Light Attack started.");
+                    if (!isAttacking)
+                    {
+                        GetComponent<AudioSelector>().PlayToporSwing();
+                    }
                     isAttacking = true;
                     animator.SetTrigger("LightAttack1");
                     Invoke("EndAttack", 1.0f); // Adjust duration if needed
@@ -312,6 +323,7 @@ public class player_Movement : MonoBehaviour
         // Detect 'F' key press
         if (Input.GetKeyDown(KeyCode.F))
         {
+            GetComponent<AudioSource>().PlayOneShot(nomnomnom);
             // Start drinking action
             isDrinking = true; // Set drinking state
             animator.SetTrigger("Drink"); // Trigger Drink animation

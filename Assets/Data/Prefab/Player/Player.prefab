@@ -3097,6 +3097,10 @@ MonoBehaviour:
   jumpAttackStaminaCost: 60
   jumpStaminaCost: 50
   animator: {fileID: 0}
+  dmgSounds:
+  - {fileID: 8300000, guid: e0159c17004a6654e8223d078b78df68, type: 3}
+  - {fileID: 8300000, guid: 3ecbe33122b1eba4e8cb8f07370e0c96, type: 3}
+  - {fileID: 8300000, guid: 62929322e12f63240a91f44b471c536f, type: 3}
   state: 0
 --- !u!81 &4180403371884418428
 AudioListener:
@@ -3237,7 +3241,8 @@ MonoBehaviour:
   villageSound: {fileID: 8300000, guid: 2e3c4a7719e3f02428198dd6eb2292a0, type: 3}
   cathedralSound: {fileID: 8300000, guid: 40c5360684ba54849b7305994b3264fb, type: 3}
   cryptSund: {fileID: 8300000, guid: b54bda0ac12592a41a7d48a91c3376ad, type: 3}
-  source: {fileID: 3303481026226908127}
+  bossSound: {fileID: 8300000, guid: 89ec2fcfe33127f45acf3eb66e2d365f, type: 3}
+  toporSwing: {fileID: 0}
 --- !u!1 &9028156351508981708
 GameObject:
   m_ObjectHideFlags: 0

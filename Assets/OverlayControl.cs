@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -11,7 +12,10 @@ public class OverlayControl : MonoBehaviour
     public GameObject ingameOverlay;
     public GameObject restingOverlay;
     public GameObject bossOverlay;
+    public GameObject gameOverOverlay;
     public HealthBar bossHPBar;
+
+    public AudioSelector audioSelector;
 
     public EnemyController enemyController;
     public EnemyHealth enemyHealth;
@@ -123,6 +127,20 @@ public class OverlayControl : MonoBehaviour
         {
             bossOverlay.SetActive(false);
         }
+        if (gameOverOverlay != null)
+        {
+            gameOverOverlay.SetActive(false);
+        }
+    }
+
+    public void YouDied()
+    {
+        Debug.Log("died");
+        bossOverlay.SetActive(false);
+        ingameOverlay.SetActive(false);
+        restingOverlay.SetActive(false);
+        gameOverOverlay.SetActive(true);
+        audioSelector.YouDiedSound();
     }
 
     public void ShowRestAtBonfire(bool val)
@@ -157,11 +175,20 @@ public class OverlayControl : MonoBehaviour
             {
                 bossOverlay.SetActive(true);
                 //suntem in bossfight
+                if (!isBossFight)
+                {
+                    audioSelector.toggleBossFightSound();
+                }
                 isBossFight = true;
 
                 float bossHP = enemyHealth.currentHealth;
                 bossHPBar.SetHealth(bossHP);
             }
         }
+    }
+
+    public void RestartBtn()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

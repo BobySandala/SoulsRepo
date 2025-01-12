@@ -19,6 +19,7 @@ public class EnemyController : MonoBehaviour
 
     private float initialYPosition; // To lock the enemy's Y position
 
+    public AudioClip swoosh;
     void Start()
     {
         animator = GetComponent<Animator>();
@@ -115,6 +116,7 @@ public class EnemyController : MonoBehaviour
                 currentAttack = "Slash1"; // Set current attack
                 animator.SetTrigger("Slash1");
             }
+            GetComponent<AudioSource>().PlayOneShot(swoosh);
         }
     }
 

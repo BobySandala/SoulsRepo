@@ -5,18 +5,33 @@ using Unity.Netcode;
 using JetBrains.Annotations;
 using UnityEngine.SceneManagement;
 
-
 namespace DS_ripoff
 {
     public class TitleScreenManager : MonoBehaviour
     {
         public void StartNetworkAsHost()
         {
-            //NetworkManager.Singleton.StartHost();
-
+            StartCoroutine(DelayedStartNetworkAsHost());
         }
+
         public void StartPlayerSelect()
         {
+            StartCoroutine(DelayedStartPlayerSelect());
+        }
+
+        private IEnumerator DelayedStartNetworkAsHost()
+        {
+            // Wait for 1 second
+            yield return new WaitForSeconds(1);
+
+            // NetworkManager.Singleton.StartHost();
+        }
+
+        private IEnumerator DelayedStartPlayerSelect()
+        {
+            // Wait for 1 second
+            yield return new WaitForSeconds(2);
+
             // Get the current active scene index
             int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
 
@@ -34,6 +49,5 @@ namespace DS_ripoff
                 Debug.LogWarning("No next scene to load!");
             }
         }
-
     }
 }

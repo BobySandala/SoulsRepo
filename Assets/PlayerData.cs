@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using static Unity.VisualScripting.Member;
 
 public class PlayerData : MonoBehaviour
 {
@@ -37,6 +39,8 @@ public class PlayerData : MonoBehaviour
 
     public Animator animator;             // Reference to the Animator component
 
+    public List<AudioClip> dmgSounds = new List<AudioClip>();
+    public AudioClip nomnomnom;
 
     // 0 - Game state, 1 - Resting state
     public int state = 0;
@@ -222,6 +226,8 @@ public class PlayerData : MonoBehaviour
         if (healthBar != null)
         {
             healthBar.SetHealth(health);
+            AudioClip clip = dmgSounds[Random.Range(0, dmgSounds.Count)];
+            GetComponent<AudioSource>().PlayOneShot(clip);
         }
 
         if (health <= 0)
@@ -233,6 +239,7 @@ public class PlayerData : MonoBehaviour
             {
                 playerAnimator.SetBool("Die", true);
             }
+            overlayControl.YouDied();
             // Other death logic here
         }
     }
@@ -248,6 +255,7 @@ public class PlayerData : MonoBehaviour
         if (healthBar != null)
         {
             healthBar.SetHealth(health);
+            GetComponent<AudioSource>().PlayOneShot(nomnomnom);
         }
     }
 

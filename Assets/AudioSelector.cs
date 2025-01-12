@@ -11,12 +11,18 @@ public class AudioSelector : MonoBehaviour
     public AudioClip villageSound;
     public AudioClip cathedralSound;
     public AudioClip cryptSund;
+    public AudioClip bossSound;
+    public AudioClip toporSwing;
+    public AudioClip youDied;
 
     private AudioClip currentSound;
+    private player_Movement pm;
     private AudioSource source;
     public void Start()
     {
         source = GetComponent<AudioSource>();
+        pm = GetComponent<player_Movement>();
+
         current_index = SceneManager.GetActiveScene().buildIndex;
         Debug.Log(current_index);
         if (current_index == 3)
@@ -62,5 +68,30 @@ public class AudioSelector : MonoBehaviour
         }
         source.clip = currentSound;
         source.Play();
+    }
+
+    public void toggleBossFightSound()
+    {
+        if (currentSound != null)
+        {
+            currentSound = bossSound;
+            source.clip = currentSound;
+            source.Play();
+        }
+    }
+
+    public void YouDiedSound()
+    {
+        if (currentSound != null)
+        {
+            currentSound = youDied;
+            source.clip = currentSound;
+            source.Play();
+        }
+    }
+
+    public void PlayToporSwing()
+    {
+        source.PlayOneShot(toporSwing);
     }
 }

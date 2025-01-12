@@ -28648,6 +28648,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -105
       objectReference: {fileID: 0}
+    - target: {fileID: 6341843062504475458, guid: 96f5730731f49014aa0720c8cfaed53f, type: 3}
+      propertyPath: cryptSund
+      value: 
+      objectReference: {fileID: 8300000, guid: 85ef1457e7439554f9982b70e8ea7547, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 96f5730731f49014aa0720c8cfaed53f, type: 3}
 --- !u!1001 &787159872
@@ -68461,6 +68465,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 365711478540088138, guid: b5ecc59cd01b9e342919a6970f6e8711, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1065957070079177786, guid: b5ecc59cd01b9e342919a6970f6e8711, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1065957070079177786, guid: b5ecc59cd01b9e342919a6970f6e8711, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6299255362446847818, guid: b5ecc59cd01b9e342919a6970f6e8711, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6299255362446847818, guid: b5ecc59cd01b9e342919a6970f6e8711, type: 3}
+      propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
